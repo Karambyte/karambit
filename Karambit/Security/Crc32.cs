@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Karambit.Utilities
+namespace Karambit.Security
 {
     public class Crc32
     {
