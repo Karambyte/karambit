@@ -3,7 +3,7 @@ using System.IO;
 
 namespace Karambit.IO
 {
-    public class ObjectReader : BinaryReader
+    public class ObjectReader
     {
         #region Methods
         #endregion
