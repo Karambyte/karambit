@@ -11,6 +11,7 @@ namespace Karambit.Web.HTTP
         private HttpMethod method;
         private string version;
         private Dictionary<string, string> headers;
+        private Dictionary<string, string> parameters;
         #endregion
 
         #region Properties
@@ -72,6 +73,16 @@ namespace Karambit.Web.HTTP
                 return headers;
             }
         }
+
+        /// <summary>
+        /// Gets the parameters.
+        /// </summary>
+        /// <value>The parameters.</value>
+        public Dictionary<string, string> Parameters {
+            get {
+                return parameters;
+            }
+        }
         #endregion
 
         #region Constructors
@@ -82,6 +93,7 @@ namespace Karambit.Web.HTTP
         public HttpRequest(HttpConnection connection) {
             this.connection = connection;
             this.headers = new Dictionary<string, string>();
+            this.parameters = new Dictionary<string, string>();
             this.version = "";
             this.path = "";
         }

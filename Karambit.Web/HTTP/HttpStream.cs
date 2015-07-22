@@ -77,7 +77,38 @@ namespace Karambit.Web.HTTP
                 throw new HttpException("The method is not supported", HttpStatus.BadRequest);
 
             // path
-            req.Path = HttpUtilities.DecodeURL(requestLine[1]);
+            string path = requestLine[1];
+
+            if (path.IndexOf('?') > -1) {
+                // split at question mark
+                string[] splitPath = path.Split('?');
+
+                // check length
+                if (splitPath.Length != 2)
+                    throw new HttpException("The path format is invalid", HttpStatus.BadRequest);
+
+                // path
+                req.Path = HttpUtilities.DecodeURL(splitPath[0]);
+
+                // query parameters
+                string[] splitParams = splitPath[1].Split('&');
+
+                foreach (string param in splitParams) {
+                    // parameter
+                    string[] paramSplit = param.Split('=');
+                    
+                    if (paramSplit.Length != 2)
+                        throw new HttpException("The path format is invalid", HttpStatus.BadRequest);
+
+                    string key = paramSplit[0];
+                    string value = paramSplit[1];
+
+                    // parameters
+                    req.Parameters.Add(key, value);
+                }
+            } else {
+                req.Path = path;
+            }
 
             // version
             if (requestLine[2] != "HTTP/1.1")

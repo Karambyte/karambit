@@ -24,7 +24,7 @@ namespace Karambit.Web
         private Logger logger;
         #endregion
 
-        #region Properties        
+        #region Properties
         /// <summary>
         /// Gets the name.
         /// </summary>
@@ -114,8 +114,38 @@ namespace Karambit.Web
             // log
             logger.Log(LogLevel.Information, "http", e.Request.Method + " " + e.Request.Path);
 
+            // parameters
+            ParameterInfo[] parameters = route.Function.GetParameters();
+            object[] parameterValues = new object[parameters.Length];
+
+            // request and response
+            parameterValues[0] = e.Request;
+            parameterValues[1] = e.Response;
+
+            // iterate
+            for (int i = 2; i < parameters.Length; i++) {
+                // get parameter
+                ParameterInfo info = parameters[i];
+                bool hasParameter = e.Request.Parameters.ContainsKey(info.Name);
+
+                if (!info.HasDefaultValue && !hasParameter) {
+                    // missing parameter and no default value
+                    e.Response.StatusCode = HttpStatus.BadRequest;
+                    e.Response.Write("The parameter " + info.Name + " is missing from the request");
+
+                    logger.Log(LogLevel.Error, "http", e.Request.Method + " " + e.Request.Path);
+                    return;
+                } else if (info.HasDefaultValue && !hasParameter) {
+                    // missing parameter has default value
+                    parameterValues[i] = info.DefaultValue;
+                } else {
+                    // parameter exists
+                    parameterValues[i] = e.Request.Parameters[info.Name];
+                }
+            }
+
             // invoke
-            route.Function.Invoke(null, new object[] { e.Request, e.Response });
+            route.Function.Invoke(null, parameterValues);
         }
 
         /// <summary>
@@ -182,6 +212,9 @@ namespace Karambit.Web
         public static void Run(Application app) {
             // start
             app.Start();
+
+            // deployment
+            app.Deployment = (System.Diagnostics.Debugger.IsAttached) ? Deployment.Production : Deployment.Release;
 
             // add stop handler
             AppDomain.CurrentDomain.ProcessExit += delegate(object sender, EventArgs e) {
