@@ -8,6 +8,7 @@ namespace Karambit.IO
         /// .NET style 7-bit encoded length prefix
         /// </summary>
         LengthEncoded,
+
         /// <summary>
         /// Null terminated
         /// </summary>

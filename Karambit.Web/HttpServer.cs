@@ -1,10 +1,13 @@
-﻿using System;
+﻿using Karambit.Serialization;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 
 namespace Karambit.Web
 {
+    public delegate void RequestEventHandler(object sender, RequestEventArgs e);
+
     public class HttpServer
     {
         #region Fields
@@ -12,11 +15,13 @@ namespace Karambit.Web
         private int port;
         private bool running;
         private Dictionary<ulong, HttpConnection> connections;
+        private Serializer serializer;
+        private string name;
 
         private static Utilities.Random random;
         #endregion
 
-        #region Properties        
+        #region Properties
         /// <summary>
         /// Gets the port.
         /// </summary>
@@ -38,9 +43,52 @@ namespace Karambit.Web
                 return running;
             }
         }
+
+        /// <summary>
+        /// Gets the serializer used for writing objects.
+        /// </summary>
+        /// <value>The serializer.</value>
+        public Serializer Serializer {
+            get {
+                return serializer;
+            }
+            set {
+                this.serializer = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the server name.
+        /// A value of null will prevent the header being sent.
+        /// </summary>
+        /// <value>The name.</value>
+        public string Name {
+            get {
+                return name;
+            }
+            set {
+                this.name = value;
+            }
+        }
         #endregion
 
-        #region Methods        
+        #region Events        
+        /// <summary>
+        /// Occurs when a the server receives a HTTP request.
+        /// </summary>
+        public event RequestEventHandler Request;
+
+        /// <summary>
+        /// Raises the <see cref="E:Request" /> event.
+        /// </summary>
+        /// <param name="e">The <see cref="RequestEventArgs"/> instance containing the event data.</param>
+        protected virtual void OnRequest(RequestEventArgs e) {
+            if (Request != null)
+                Request(this, e);
+        }
+        #endregion
+
+        #region Methods
         /// <summary>
         /// Starts the HTTP server.
         /// </summary>
@@ -53,7 +101,7 @@ namespace Karambit.Web
             // start
             listener.Start();
             listener.BeginAcceptTcpClient(new AsyncCallback(Accept), null);
-
+            
             // state
             running = true;
         }
@@ -113,6 +161,8 @@ namespace Karambit.Web
             this.port = port;
             this.listener = new TcpListener(address, port);
             this.connections = new Dictionary<ulong, HttpConnection>();
+            this.serializer = new EmptySerializer();
+            this.name = "Karambit WS";
         }
 
         /// <summary>

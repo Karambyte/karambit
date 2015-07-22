@@ -33,14 +33,6 @@ namespace Karambit.Serialization
 
         #region Methods        
         /// <summary>
-        /// Serializes the object to the specified stream.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="stream">The stream.</param>
-        /// <param name="obj">The object.</param>
-        public abstract void Serialize<T>(Stream stream, T obj);
-
-        /// <summary>
         /// Deserializes the object from the specified stream.
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -48,6 +40,14 @@ namespace Karambit.Serialization
         /// <returns></returns>
         public abstract T Deserialize<T>(Stream stream);
 
+        /// <summary>
+        /// Serializes the object to the specified stream.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="stream">The stream.</param>
+        /// <param name="obj">The object.</param>
+        public abstract void Serialize<T>(Stream stream, T obj);
+        
         /// <summary>
         /// Serializes the specified object to binary data.
         /// </summary>

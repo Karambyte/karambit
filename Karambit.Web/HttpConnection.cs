@@ -13,6 +13,10 @@ namespace Karambit.Web
         private HttpServer server;
         private ulong id;
         private Thread thread;
+
+        private NetworkStream stream;
+        private StreamWriter writer;
+        private StreamReader reader;
         #endregion
 
         #region Properties
@@ -35,28 +39,73 @@ namespace Karambit.Web
                 return id;
             }
         }
+
+        /// <summary>
+        /// Gets the writer.
+        /// </summary>
+        /// <value>The writer.</value>
+        internal StreamWriter Writer {
+            get {
+                return writer;
+            }
+        }
+
+        /// <summary>
+        /// Gets the internal reader.
+        /// </summary>
+        /// <value>The reader.</value>
+        internal StreamReader Reader {
+            get {
+                return reader;
+            }
+        }
+
+        /// <summary>
+        /// Gets the stream.
+        /// </summary>
+        /// <value>The stream.</value>
+        internal Stream Stream {
+            get {
+                return stream;
+            }
+        }
         #endregion
 
-        #region Methods
+        #region Methods        
+        /// <summary>
+        /// Processes the incoming connection.
+        /// </summary>
         private void Process() {
-            StreamReader sr = new StreamReader(client.GetStream());
+            // streams
+            this.stream = client.GetStream();
+            this.reader = new StreamReader(this.stream);
+            this.writer = new StreamWriter(this.stream);
 
-            string requestLine = sr.ReadLine();
-            Console.WriteLine(requestLine);
-
-            string stuff = "{\"jamie\":\"sucks\"}";
-            byte[] stuffData = Encoding.UTF8.GetBytes(stuff);
-            StreamWriter sw = new StreamWriter(client.GetStream());
-            sw.WriteLine("HTTP/1.1 200 OK");
-            sw.WriteLine("Content-Type: application/json");
-            sw.WriteLine("Content-Length: " + stuffData.Length + "");
-            sw.WriteLine();
-            sw.Flush();
-            try {
-                sw.BaseStream.Write(stuffData, 0, stuffData.Length);
+            // handle requests
+            while (client.Connected) {
+                Handle();
             }
-            catch (Exception) { }
-            client.Close();
+        }
+
+        /// <summary>
+        /// Handles the request.
+        /// </summary>
+        private void Handle() {
+            // requests/response
+            HttpRequest req = new HttpRequest(this);
+            HttpResponse res = new HttpResponse(this);
+
+            // request line
+            string strReqLine = reader.ReadLine();
+            string[] requestLine = strReqLine.Split(' ');
+
+            if (requestLine.Length != 3) {
+                res.Send(HttpStatus.BadRequest);
+                return;
+            }
+
+            Console.WriteLine(strReqLine);
+            res.Send(HttpStatus.OK);
         }
 
         /// <summary>
@@ -67,7 +116,13 @@ namespace Karambit.Web
         }
         #endregion
 
-        #region Constructors
+        #region Constructors        
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HttpConnection"/> class.
+        /// </summary>
+        /// <param name="server">The server.</param>
+        /// <param name="id">The identifier.</param>
+        /// <param name="client">The client.</param>
         public HttpConnection(HttpServer server, ulong id, TcpClient client) {
             this.client = client;
             this.server = server;

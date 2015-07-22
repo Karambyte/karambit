@@ -6,17 +6,11 @@ namespace Karambit.Serialization
     public class ObjectSerializer : Serializer
     {
         #region Enums
-        enum 
         #endregion
 
         #region Methods
         public override T Deserialize<T>(System.IO.Stream stream) {
-            // read type
-            byte typeCode = (byte)stream.ReadByte();
-
-            TypeCode.
-
-            ObjectReader reader = new ObjectReader();
+            throw new NotImplementedException();
         }
 
         public override void Serialize<T>(System.IO.Stream stream, T obj) {
