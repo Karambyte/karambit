@@ -143,7 +143,9 @@ namespace Karambit.Web.HTTP
             }
 
             // write
-            stream.Write(res);
+            try {
+                stream.Write(res);
+            } catch (Exception) {}
         }
 
         /// <summary>
