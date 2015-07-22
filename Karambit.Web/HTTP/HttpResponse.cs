@@ -57,17 +57,29 @@ namespace Karambit.Web.HTTP
                 return buffer;
             }
         }
+
         /// <summary>
         /// Gets or sets the type of the content.
         /// </summary>
-        /// <value>
-        /// The type of the content.
-        /// </value>
+        /// <value>The type of the content.</value>
         public string ContentType {
             get {
                 return headers["Content-Type"];
             } set {
                 this.headers["Content-Type"] = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the location.
+        /// </summary>
+        /// <value>The location.</value>
+        public string Location {
+            get {
+                return headers.ContainsKey("Location") ? headers["Location"] : "";
+            }
+            set {
+                this.headers["Location"] = value;
             }
         }
 
@@ -127,6 +139,18 @@ namespace Karambit.Web.HTTP
         /// <param name="obj">The object.</param>
         public void Write(object obj) {
             Write(connection.Server.Serializer.Serialize(obj));
+        }
+
+        /// <summary>
+        /// Writes a file to the buffer.
+        /// </summary>
+        /// <param name="path">The path.</param>
+        public void WriteFile(string path) {
+            // read file
+            byte[] data = File.ReadAllBytes(path);
+
+            // write
+            buffer.Write(data, 0, data.Length);
         }
         #endregion
 

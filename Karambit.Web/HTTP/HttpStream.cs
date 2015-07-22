@@ -22,8 +22,15 @@ namespace Karambit.Web.HTTP
         /// </summary>
         /// <param name="res">The response.</param>
         public void Write(HttpResponse res) {
+            // status code
+            HttpStatus status = res.StatusCode;
+
+            // override for location redirects
+            if (res.Headers.ContainsKey("Location"))
+                status = HttpStatus.Found;
+
             // response
-            writer.WriteLine("HTTP/1.1 " + (int)res.StatusCode + " " + statusStrings[res.StatusCode]);
+            writer.WriteLine("HTTP/1.1 " + (int)status + " " + statusStrings[status]);
 
             // headers
             foreach (KeyValuePair<string, string> header in res.Headers) {
@@ -32,6 +39,7 @@ namespace Karambit.Web.HTTP
 
             // default headers
             writer.WriteLine("Content-Length: " + res.Buffer.Length);
+            writer.WriteLine("Connection: Keep-Alive");
 
             if (res.Server.Name != null)
                 writer.WriteLine("Server: " + res.Server.Name);

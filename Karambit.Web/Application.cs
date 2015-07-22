@@ -101,6 +101,9 @@ namespace Karambit.Web
                 }
             }
 
+            // name header
+            e.Response.Headers["X-Application-Name"] = name;
+
             // check found
             if (route == null) {
                 e.Response.StatusCode = HttpStatus.NotFound;
