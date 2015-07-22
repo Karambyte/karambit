@@ -43,6 +43,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Application.cs" />
+    <Compile Include="ApplicationRoute.cs" />
+    <Compile Include="ApplicationRouteAttribute.cs" />
     <Compile Include="HTTP\HttpClient.cs" />
     <Compile Include="HTTP\HttpConnection.cs" />
     <Compile Include="HTTP\HttpException.cs" />

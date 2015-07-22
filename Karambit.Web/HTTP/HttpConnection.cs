@@ -108,17 +108,18 @@ namespace Karambit.Web.HTTP
 
             // handle request
             if (req != null) {
-                try {
+                if (server.Deployment == Deployment.Production) {
                     server.OnRequest(new RequestEventArgs(req, res));
-                }
-                catch (Exception ex) {
-                    // internal error with request handler
-                    res.Clear();
-                    res.StatusCode = HttpStatus.InternalServerError;
-
-                    // send error report
-                    if (server.Deployment == Deployment.Production)
-                        res.Write("<b><p>Application Error</p></b><pre>" + ex.ToString() + "</pre>");
+                } else {
+                    try {
+                        server.OnRequest(new RequestEventArgs(req, res));
+                    }
+                    catch (Exception) {
+                        // internal error with request handler
+                        res.Clear();
+                        res.StatusCode = HttpStatus.InternalServerError;
+                        res.Write("<pre>An internal server error occured!</pre>");
+                    }
                 }
             }
 
