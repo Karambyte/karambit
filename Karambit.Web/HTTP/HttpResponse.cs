@@ -164,7 +164,8 @@ namespace Karambit.Web.HTTP
             this.status = HttpStatus.OK;
             this.buffer = new MemoryStream();
             this.headers = new Dictionary<string, string>() {
-                {"Content-Type", "text/html"}
+                {"Content-Type", "text/html"},
+                {"X-Frame-Options", "deny"}
             };
         }
         #endregion

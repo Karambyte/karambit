@@ -144,9 +144,6 @@ namespace Karambit.Web.HTTP
 
             // write
             stream.Write(res);
-
-            // close
-            Close();
         }
 
         /// <summary>
