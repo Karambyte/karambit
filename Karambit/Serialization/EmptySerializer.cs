@@ -19,11 +19,10 @@ namespace Karambit.Serialization
         /// <summary>
         /// Serializes the object to the specified stream.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <param name="stream">The stream.</param>
         /// <param name="obj">The object.</param>
         /// <exception cref="System.NotImplementedException"></exception>
-        public override void Serialize<T>(System.IO.Stream stream, T obj) {
+        public override void Serialize(System.IO.Stream stream, object obj) {
             throw new NotImplementedException();
         }
         #endregion

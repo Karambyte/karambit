@@ -1,5 +1,6 @@
 ﻿using Karambit.IO;
 using System;
+using System.IO;
 
 namespace Karambit.Serialization
 {
@@ -9,11 +10,11 @@ namespace Karambit.Serialization
         #endregion
 
         #region Methods
-        public override T Deserialize<T>(System.IO.Stream stream) {
+        public override T Deserialize<T>(Stream stream) {
             throw new NotImplementedException();
         }
 
-        public override void Serialize<T>(System.IO.Stream stream, T obj) {
+        public override void Serialize(Stream stream, object obj) {
             throw new NotImplementedException();
         }
 

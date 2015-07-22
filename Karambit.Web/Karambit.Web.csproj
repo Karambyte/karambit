@@ -33,25 +33,38 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HttpClient.cs" />
-    <Compile Include="HttpConnection.cs" />
-    <Compile Include="HttpRequest.cs" />
-    <Compile Include="HttpResponse.cs" />
-    <Compile Include="HttpServer.cs" />
-    <Compile Include="HttpStatus.cs" />
+    <Compile Include="Application.cs" />
+    <Compile Include="HTTP\HttpClient.cs" />
+    <Compile Include="HTTP\HttpConnection.cs" />
+    <Compile Include="HTTP\HttpException.cs" />
+    <Compile Include="HTTP\HttpMethod.cs" />
+    <Compile Include="HTTP\HttpRequest.cs" />
+    <Compile Include="HTTP\HttpResponse.cs" />
+    <Compile Include="HTTP\HttpServer.cs" />
+    <Compile Include="HTTP\HttpStatus.cs" />
+    <Compile Include="HTTP\HttpStream.cs" />
+    <Compile Include="HTTP\HttpUtilities.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RequestEventArgs.cs" />
+    <Compile Include="HTTP\RequestEventArgs.cs" />
+    <Compile Include="Serialization\JSONSerializer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Karambit\Karambit.csproj">
       <Project>{57ac7e01-fb7d-41a7-941a-218d1094e0b2}</Project>
       <Name>Karambit</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

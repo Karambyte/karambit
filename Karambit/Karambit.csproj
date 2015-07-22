@@ -34,6 +34,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Deployment.cs" />
     <Compile Include="IO\ObjectReader.cs" />
     <Compile Include="IO\ObjectWriter.cs" />
     <Compile Include="IO\StringFormat.cs" />
@@ -44,6 +45,7 @@
     <Compile Include="Serialization\Serializer.cs" />
     <Compile Include="Security\Crc32.cs" />
     <Compile Include="Security\Random.cs" />
+    <Compile Include="Serialization\SerializerFormat.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

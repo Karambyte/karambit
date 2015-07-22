@@ -1,10 +1,11 @@
 ﻿using System;
 using System.IO;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 
-namespace Karambit.Web
+namespace Karambit.Web.HTTP
 {
     public class HttpConnection
     {
@@ -13,10 +14,9 @@ namespace Karambit.Web
         private HttpServer server;
         private ulong id;
         private Thread thread;
+        private string address;
 
-        private NetworkStream stream;
-        private StreamWriter writer;
-        private StreamReader reader;
+        private HttpStream stream;
         #endregion
 
         #region Properties
@@ -41,32 +41,22 @@ namespace Karambit.Web
         }
 
         /// <summary>
-        /// Gets the writer.
-        /// </summary>
-        /// <value>The writer.</value>
-        internal StreamWriter Writer {
-            get {
-                return writer;
-            }
-        }
-
-        /// <summary>
-        /// Gets the internal reader.
-        /// </summary>
-        /// <value>The reader.</value>
-        internal StreamReader Reader {
-            get {
-                return reader;
-            }
-        }
-
-        /// <summary>
         /// Gets the stream.
         /// </summary>
         /// <value>The stream.</value>
-        internal Stream Stream {
+        public HttpStream Stream {
             get {
                 return stream;
+            }
+        }
+
+        /// <summary>
+        /// Gets the remote address.
+        /// </summary>
+        /// <value>The address.</value>
+        public string Address {
+            get {
+                return address;
             }
         }
         #endregion
@@ -76,10 +66,8 @@ namespace Karambit.Web
         /// Processes the incoming connection.
         /// </summary>
         private void Process() {
-            // streams
-            this.stream = client.GetStream();
-            this.reader = new StreamReader(this.stream);
-            this.writer = new StreamWriter(this.stream);
+            // create stream
+            this.stream = new HttpStream(this, client.GetStream());
 
             // handle requests
             while (client.Connected) {
@@ -91,28 +79,63 @@ namespace Karambit.Web
         /// Handles the request.
         /// </summary>
         private void Handle() {
-            // requests/response
-            HttpRequest req = new HttpRequest(this);
+            // create response
             HttpResponse res = new HttpResponse(this);
+            HttpRequest req = null;
 
-            // request line
-            string strReqLine = reader.ReadLine();
-            string[] requestLine = strReqLine.Split(' ');
+            // read request
+            try {
+                req = stream.Read();
+            } catch (HttpException ex) {
+                // send
+                res.StatusCode = ex.StatusCode;
 
-            if (requestLine.Length != 3) {
-                res.Send(HttpStatus.BadRequest);
+                // send error report
+                if (server.Deployment == Deployment.Production)
+                    res.Write("<b><p>Request Error</p></b><pre>" + ex.Message + "</pre>");
+            } catch (Exception ex) {
+                // send error report
+                try {
+                    if (server.Deployment == Deployment.Production)
+                        res.Write("<b><p>Internal Error</p></b><pre>" + ex.ToString() + "</pre>");
+                }
+                catch (Exception) { }
+
+                // close and return
+                Close();
                 return;
             }
 
-            Console.WriteLine(strReqLine);
-            res.Send(HttpStatus.OK);
+            // handle request
+            if (req != null) {
+                try {
+                    server.OnRequest(new RequestEventArgs(req, res));
+                }
+                catch (Exception ex) {
+                    // internal error with request handler
+                    res.Clear();
+                    res.StatusCode = HttpStatus.InternalServerError;
+
+                    // send error report
+                    if (server.Deployment == Deployment.Production)
+                        res.Write("<b><p>Application Error</p></b><pre>" + ex.ToString() + "</pre>");
+                }
+            }
+
+            // write
+            stream.Write(res);
+
+            // close
+            Close();
         }
 
         /// <summary>
         /// Closes the connection.
         /// </summary>
         public void Close() {
-            client.Close();
+            try {
+                client.Close();
+            } catch (Exception) { }
         }
         #endregion
 
@@ -125,6 +148,7 @@ namespace Karambit.Web
         /// <param name="client">The client.</param>
         public HttpConnection(HttpServer server, ulong id, TcpClient client) {
             this.client = client;
+            this.address = ((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString();
             this.server = server;
             this.id = id;
 

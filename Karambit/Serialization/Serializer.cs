@@ -43,20 +43,18 @@ namespace Karambit.Serialization
         /// <summary>
         /// Serializes the object to the specified stream.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <param name="stream">The stream.</param>
         /// <param name="obj">The object.</param>
-        public abstract void Serialize<T>(Stream stream, T obj);
+        public abstract void Serialize(Stream stream, object obj);
         
         /// <summary>
         /// Serializes the specified object to binary data.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <param name="obj">The object.</param>
         /// <returns></returns>
-        public byte[] Serialize<T>(T obj) {
+        public byte[] Serialize(object obj) {
             using (MemoryStream ms = new MemoryStream()) {
-                Serialize<T>(ms, obj);
+                Serialize(ms, obj);
                 return ms.ToArray();
             }
         }

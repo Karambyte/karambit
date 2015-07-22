@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Karambit.Web
+namespace Karambit.Web.HTTP
 {
     public class HttpClient
     {

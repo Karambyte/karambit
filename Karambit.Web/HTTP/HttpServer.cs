@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 
-namespace Karambit.Web
+namespace Karambit.Web.HTTP
 {
     public delegate void RequestEventHandler(object sender, RequestEventArgs e);
 
@@ -17,6 +17,7 @@ namespace Karambit.Web
         private Dictionary<ulong, HttpConnection> connections;
         private Serializer serializer;
         private string name;
+        private Deployment deployment;
 
         private static Utilities.Random random;
         #endregion
@@ -70,6 +71,19 @@ namespace Karambit.Web
                 this.name = value;
             }
         }
+
+        /// <summary>
+        /// Gets or sets the deployment.
+        /// </summary>
+        /// <value>The deployment.</value>
+        public Deployment Deployment {
+            get {
+                return deployment;
+            }
+            set {
+                this.deployment = value;
+            }
+        }
         #endregion
 
         #region Events        
@@ -82,7 +96,7 @@ namespace Karambit.Web
         /// Raises the <see cref="E:Request" /> event.
         /// </summary>
         /// <param name="e">The <see cref="RequestEventArgs"/> instance containing the event data.</param>
-        protected virtual void OnRequest(RequestEventArgs e) {
+        internal virtual void OnRequest(RequestEventArgs e) {
             if (Request != null)
                 Request(this, e);
         }
