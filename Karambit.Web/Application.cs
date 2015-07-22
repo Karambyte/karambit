@@ -196,9 +196,9 @@ namespace Karambit.Web
 
                         if (parameters.Length < 2)
                             throw new Exception("The route " + method.ToString() + " requires at least 2 parameters");
-                        else if (parameters[0].GetType() != typeof(HttpRequest))
+                        else if (parameters[0].ParameterType != typeof(HttpRequest))
                             throw new Exception("The route " + method.ToString() + " must have a HttpRequest object as it's first parameter");
-                        else if (parameters[1].GetType() != typeof(HttpResponse))
+                        else if (parameters[1].ParameterType != typeof(HttpResponse))
                             throw new Exception("The route " + method.ToString() + " must have a HttpResponse object as it's second parameter");
 
                         routes.Add(new ApplicationRoute((ApplicationRouteAttribute)att, method));
