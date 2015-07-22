@@ -7,6 +7,7 @@ using System.Net.Sockets;
 namespace Karambit.Web.HTTP
 {
     public delegate void RequestEventHandler(object sender, RequestEventArgs e);
+    public delegate void ErrorEventHandler(object sender, ErrorEventArgs e);
 
     public class HttpServer
     {
@@ -93,12 +94,26 @@ namespace Karambit.Web.HTTP
         public event RequestEventHandler Request;
 
         /// <summary>
+        /// Occurs when an error is about to be handled.
+        /// </summary>
+        public event ErrorEventHandler Error;
+
+        /// <summary>
         /// Raises the <see cref="E:Request" /> event.
         /// </summary>
         /// <param name="e">The <see cref="RequestEventArgs"/> instance containing the event data.</param>
         internal virtual void OnRequest(RequestEventArgs e) {
             if (Request != null)
                 Request(this, e);
+        }
+
+        /// <summary>
+        /// Raises the <see cref="E:Error" /> event.
+        /// </summary>
+        /// <param name="e">The <see cref="ErrorEventArgs"/> instance containing the event data.</param>
+        internal virtual void OnError(ErrorEventArgs e) {
+            if (Error != null)
+                Error(this, e);
         }
         #endregion
 

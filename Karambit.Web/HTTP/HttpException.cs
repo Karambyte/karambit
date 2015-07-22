@@ -6,6 +6,8 @@ namespace Karambit.Web.HTTP
     {
         #region Fields
         private HttpStatus status;
+        private string path;
+        private HttpMethod method;
         #endregion
 
         #region Properties        
@@ -16,6 +18,32 @@ namespace Karambit.Web.HTTP
         public HttpStatus StatusCode {
             get {
                 return status;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the method.
+        /// </summary>
+        /// <value>The method.</value>
+        public HttpMethod Method {
+            get {
+                return method;
+            }
+            set {
+                this.method = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the path.
+        /// </summary>
+        /// <value>The path.</value>
+        public string Path {
+            get {
+                return path;
+            }
+            set {
+                this.path = value;
             }
         }
         #endregion

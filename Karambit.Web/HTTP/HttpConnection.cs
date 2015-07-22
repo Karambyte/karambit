@@ -87,13 +87,24 @@ namespace Karambit.Web.HTTP
             try {
                 req = stream.Read();
             } catch (HttpException ex) {
-                // send
-                res.StatusCode = ex.StatusCode;
+                // create event
+                ErrorEventArgs e = new ErrorEventArgs(ex);
 
-                // send error report
-                if (server.Deployment == Deployment.Production)
-                    res.Write("<b><p>Request Error</p></b><pre>" + ex.Message + "</pre>");
+                // invoke
+                server.OnError(e);
+
+                if (!e.Handled) {
+                    // send
+                    res.StatusCode = ex.StatusCode;
+
+                    // send error report
+                    if (server.Deployment == Deployment.Production)
+                        res.Write("<b><p>Request Error</p></b><pre>" + ex.Message + "</pre>");
+                }
             } catch (Exception ex) {
+                // status code
+                res.StatusCode = HttpStatus.InternalServerError;
+
                 // send error report
                 try {
                     if (server.Deployment == Deployment.Production)
@@ -114,11 +125,19 @@ namespace Karambit.Web.HTTP
                     try {
                         server.OnRequest(new RequestEventArgs(req, res));
                     }
-                    catch (Exception) {
-                        // internal error with request handler
+                    catch (Exception ex) {
+                        // create event
+                        ErrorEventArgs e = new ErrorEventArgs(new HttpException("Route exception", HttpStatus.InternalServerError, ex) { Path = req.Path, Method = req.Method});
+
+                        // invoke
                         res.Clear();
                         res.StatusCode = HttpStatus.InternalServerError;
-                        res.Write("<pre>An internal server error occured!</pre>");
+                        server.OnError(e);
+
+                        if (!e.Handled) {
+                            // internal error with request handler
+                            res.Write("<pre>An internal server error occured!</pre>");
+                        }
                     }
                 }
             }

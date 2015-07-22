@@ -57,7 +57,7 @@ namespace Karambit.Web.HTTP
 
             // check
             if (requestLine.Length != 3)
-                throw new HttpException("The request line is invalid", HttpStatus.BadRequest);
+                throw new HttpException("The request line is invalid", HttpStatus.BadRequest) { Path = null };
 
             // create request
             HttpRequest req = new HttpRequest(connection);
@@ -74,7 +74,7 @@ namespace Karambit.Web.HTTP
             }
 
             if (!validMethod)
-                throw new HttpException("The method is not supported", HttpStatus.BadRequest);
+                throw new HttpException("The method is not supported", HttpStatus.BadRequest) { Path = null };
 
             // path
             string path = requestLine[1];
@@ -85,7 +85,7 @@ namespace Karambit.Web.HTTP
 
                 // check length
                 if (splitPath.Length != 2)
-                    throw new HttpException("The path format is invalid", HttpStatus.BadRequest);
+                    throw new HttpException("The path format is invalid", HttpStatus.BadRequest) { Path = path, Method = req.Method };
 
                 // path
                 req.Path = HttpUtilities.DecodeURL(splitPath[0]);
@@ -98,7 +98,7 @@ namespace Karambit.Web.HTTP
                     string[] paramSplit = param.Split('=');
                     
                     if (paramSplit.Length != 2)
-                        throw new HttpException("The path format is invalid", HttpStatus.BadRequest);
+                        throw new HttpException("The path format is invalid", HttpStatus.BadRequest) { Path = req.Path, Method = req.Method };
 
                     string key = paramSplit[0];
                     string value = paramSplit[1];
@@ -112,7 +112,7 @@ namespace Karambit.Web.HTTP
 
             // version
             if (requestLine[2] != "HTTP/1.1")
-                throw new HttpException("The version is invalid", HttpStatus.BadRequest);
+                throw new HttpException("The version is invalid", HttpStatus.BadRequest) { Path = req.Path, Method = req.Method };
 
             req.Version = requestLine[2];
 

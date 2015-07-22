@@ -111,9 +111,6 @@ namespace Karambit.Web
                 return;
             }
 
-            // log
-            logger.Log(LogLevel.Information, "http", e.Request.Method + " " + e.Request.Path);
-
             // parameters
             ParameterInfo[] parameters = route.Function.GetParameters();
             object[] parameterValues = new object[parameters.Length];
@@ -144,8 +141,21 @@ namespace Karambit.Web
                 }
             }
 
+            // log
+            logger.Log(LogLevel.Information, "http", e.Request.Method + " " + e.Request.Path);
+
             // invoke
             route.Function.Invoke(null, parameterValues);
+        }
+
+        /// <summary>
+        /// Handles the error.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="ErrorEventArgs"/> instance containing the event data.</param>
+        private void HandleError(object sender, ErrorEventArgs e) {
+            // log
+            logger.Log(LogLevel.Error, "http", e.Exception.Method + " " + e.Exception.Path);
         }
 
         /// <summary>
@@ -181,6 +191,16 @@ namespace Karambit.Web
 
                     // if static and has route attribute, add
                     if (method.IsStatic && att != null) {
+                        // get parameters
+                        ParameterInfo[] parameters = method.GetParameters();
+
+                        if (parameters.Length < 2)
+                            throw new Exception("The route " + method.ToString() + " requires at least 2 parameters");
+                        else if (parameters[0].GetType() != typeof(HttpRequest))
+                            throw new Exception("The route " + method.ToString() + " must have a HttpRequest object as it's first parameter");
+                        else if (parameters[1].GetType() != typeof(HttpResponse))
+                            throw new Exception("The route " + method.ToString() + " must have a HttpResponse object as it's second parameter");
+
                         routes.Add(new ApplicationRoute((ApplicationRouteAttribute)att, method));
                     }
                 }
@@ -210,11 +230,11 @@ namespace Karambit.Web
         /// </summary>
         /// <param name="app">The application.</param>
         public static void Run(Application app) {
-            // start
-            app.Start();
-
             // deployment
             app.Deployment = (System.Diagnostics.Debugger.IsAttached) ? Deployment.Production : Deployment.Release;
+
+            // start
+            app.Start();
 
             // add stop handler
             AppDomain.CurrentDomain.ProcessExit += delegate(object sender, EventArgs e) {
@@ -236,6 +256,7 @@ namespace Karambit.Web
             // server
             this.server = new HttpServer(port);
             this.server.Request += HandleRequest;
+            this.server.Error += HandleError;
             this.server.Serializer = new JSONSerializer(SerializerFormat.Minimized);
 
             // routes
