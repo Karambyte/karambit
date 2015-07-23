@@ -1,4 +1,5 @@
-﻿using Karambit.Serialization;
+﻿using Karambit.Net;
+using Karambit.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -9,7 +10,7 @@ namespace Karambit.Web.HTTP
     public delegate void RequestEventHandler(object sender, RequestEventArgs e);
     public delegate void ErrorEventHandler(object sender, ErrorEventArgs e);
 
-    public class HttpServer
+    public class HttpServer : IServer
     {
         #region Fields
         private TcpListener listener;
