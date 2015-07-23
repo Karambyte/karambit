@@ -15,7 +15,7 @@ namespace Karambit.Web.HTTP
         private ulong id;
         private Thread thread;
         private string address;
-
+        private HttpProtocol protocol;
         private HttpStream stream;
         #endregion
 
@@ -37,6 +37,16 @@ namespace Karambit.Web.HTTP
         public ulong ID {
             get {
                 return id;
+            }
+        }
+
+        /// <summary>
+        /// Gets the protocol used for communication.
+        /// </summary>
+        /// <value>The protocol.</value>
+        public HttpProtocol Protocol {
+            get {
+                return protocol;
             }
         }
 
