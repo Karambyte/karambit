@@ -11,7 +11,7 @@ namespace Karambit.Web
     public delegate void StartedEventHandler(object sender, EventArgs e);
     public delegate void StoppedEventHandler(object sender, EventArgs e);
 
-    public class Application
+    public class App
     {
         #region Constants
         private const string DefaultName = "Untitled Application";
@@ -20,8 +20,10 @@ namespace Karambit.Web
         #region Fields
         private HttpServer server;
         private string name;
-        private List<ApplicationRoute> routes;
+        private List<Route> routes;
         private Logger logger;
+
+        private static App currentApp = null;
         #endregion
 
         #region Properties
@@ -61,6 +63,16 @@ namespace Karambit.Web
                     ((JSONSerializer)this.server.Serializer).Format = (value == Deployment.Production) ? SerializerFormat.Tidy : SerializerFormat.Minimized;
             }
         }
+
+        /// <summary>
+        /// Gets the currently executing application (if any).
+        /// </summary>
+        /// <value>The current app.</value>
+        public static App Current {
+            get {
+                return currentApp;
+            }
+        }
         #endregion
 
         #region Events
@@ -91,10 +103,10 @@ namespace Karambit.Web
         /// <param name="sender">The sender.</param>
         /// <param name="e">The <see cref="RequestEventArgs"/> instance containing the event data.</param>
         private void HandleRequest(object sender, RequestEventArgs e) {
-            ApplicationRoute route = null;
+            Route route = null;
 
             // find route
-            foreach (ApplicationRoute r in routes) {
+            foreach (Route r in routes) {
                 if (r.Path == e.Request.Path && r.Method == e.Request.Method) {
                     route = r;
                     break;
@@ -190,7 +202,7 @@ namespace Karambit.Web
             foreach (Type t in assembly.GetTypes()) {
                 // get all methods
                 foreach (MethodInfo method in t.GetMethods()) {
-                    Attribute att = method.GetCustomAttribute(typeof(ApplicationRouteAttribute));
+                    Attribute att = method.GetCustomAttribute(typeof(RouteAttribute));
 
                     // if static and has route attribute, add
                     if (method.IsStatic && att != null) {
@@ -204,7 +216,7 @@ namespace Karambit.Web
                         else if (parameters[1].ParameterType != typeof(HttpResponse))
                             throw new Exception("The route " + method.ToString() + " must have a HttpResponse object as it's second parameter");
 
-                        routes.Add(new ApplicationRoute((ApplicationRouteAttribute)att, method));
+                        routes.Add(new Route((RouteAttribute)att, method));
                     }
                 }
             }
@@ -215,16 +227,16 @@ namespace Karambit.Web
         /// </summary>
         /// <param name="assembly">The assembly.</param>
         public void Remove(Assembly assembly) {
-            List<ApplicationRoute> removeRoutes = new List<ApplicationRoute>();
+            List<Route> removeRoutes = new List<Route>();
 
             // find all routes with the specified assembly
-            foreach (ApplicationRoute route in routes) {
+            foreach (Route route in routes) {
                 if (route.Assembly == assembly)
                     removeRoutes.Add(route);
             }
 
             // remove all
-            foreach (ApplicationRoute route in removeRoutes)
+            foreach (Route route in removeRoutes)
                 routes.Remove(route);
         }
 
@@ -233,7 +245,7 @@ namespace Karambit.Web
         /// </summary>
         /// <param name="app">The application.</param>
         /// <param name="args">The arguments.</param>
-        public static void Run(Application app, string[] args) {
+        public static void Run(App app, string[] args) {
             // deployment
             app.Deployment = (System.Diagnostics.Debugger.IsAttached) ? Deployment.Production : Deployment.Release;
 
@@ -245,6 +257,9 @@ namespace Karambit.Web
                 app.Stop();
             };
 
+            // setup current
+            currentApp = app;
+
             // wait
             while (true)
                 Console.ReadLine();
@@ -254,17 +269,17 @@ namespace Karambit.Web
         /// Runs the specified application.
         /// </summary>
         /// <param name="app">The application.</param>
-        public static void Run(Application app) {
+        public static void Run(App app) {
             Run(app, new string[] { });
         }
         #endregion
 
-        #region Constructors                
+        #region Constructors
         /// <summary>
-        /// Initializes a new instance of the <see cref="Application"/> class.
+        /// Initializes a new instance of the <see cref="App"/> class.
         /// </summary>
         /// <param name="port">The port.</param>
-        public Application(int port) {
+        public App(int port) {
             // server
             this.server = new HttpServer(port);
             this.server.Request += HandleRequest;
@@ -272,7 +287,7 @@ namespace Karambit.Web
             this.server.Serializer = new JSONSerializer(SerializerFormat.Minimized);
 
             // routes
-            this.routes = new List<ApplicationRoute>();
+            this.routes = new List<Route>();
 
             // default name.
             this.name = DefaultName;
@@ -288,45 +303,45 @@ namespace Karambit.Web
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Application"/> class.
+        /// Initializes a new instance of the <see cref="App"/> class.
         /// </summary>
         /// <param name="port">The port.</param>
         /// <param name="name">The name.</param>
-        public Application(int port, string name)
+        public App(int port, string name)
             : this(port) {
             this.name = name;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Application"/> class.
+        /// Initializes a new instance of the <see cref="App"/> class.
         /// </summary>
         /// <param name="port">The port.</param>
         /// <param name="name">The name.</param>
         /// <param name="logger">The logger.</param>
-        public Application(int port, string name, Logger logger)
+        public App(int port, string name, Logger logger)
             : this(port, name) {
             this.logger = logger;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Application"/> class.
+        /// Initializes a new instance of the <see cref="App"/> class.
         /// </summary>
         /// <param name="port">The port.</param>
         /// <param name="name">The name.</param>
         /// <param name="deployment">The deployment.</param>
-        public Application(int port, string name, Deployment deployment)
+        public App(int port, string name, Deployment deployment)
             : this(port, name) {
             this.Deployment = deployment;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Application"/> class.
+        /// Initializes a new instance of the <see cref="App"/> class.
         /// </summary>
         /// <param name="port">The port.</param>
         /// <param name="name">The name.</param>
         /// <param name="logger">The logger.</param>
         /// <param name="deployment">The deployment.</param>
-        public Application(int port, string name, Logger logger, Deployment deployment)
+        public App(int port, string name, Logger logger, Deployment deployment)
             : this(port, name, logger) {
             this.Deployment = deployment;
         }

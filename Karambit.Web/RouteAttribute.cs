@@ -3,7 +3,7 @@ using System;
 
 namespace Karambit.Web
 {
-    public class ApplicationRouteAttribute : Attribute
+    public class RouteAttribute : Attribute
     {
         #region Fields
         private HttpMethod method;
@@ -11,7 +11,7 @@ namespace Karambit.Web
         private string host;
         #endregion
 
-        #region Properties        
+        #region Properties
         /// <summary>
         /// Gets or sets the method.
         /// </summary>
@@ -54,25 +54,25 @@ namespace Karambit.Web
         }
         #endregion
 
-        #region Constructors        
+        #region Constructors
         /// <summary>
-        /// Initializes a new instance of the <see cref="ApplicationRouteAttribute"/> class.
+        /// Initializes a new instance of the <see cref="RouteAttribute"/> class.
         /// </summary>
         /// <param name="method">The method.</param>
         /// <param name="path">The path.</param>
-        public ApplicationRouteAttribute(HttpMethod method, string path) {
+        public RouteAttribute(HttpMethod method, string path) {
             this.method = method;
             this.path = path;
             this.host = "*";
         }
         
         /// <summary>
-        /// Initializes a new instance of the <see cref="ApplicationRouteAttribute"/> class.
+        /// Initializes a new instance of the <see cref="RouteAttribute"/> class.
         /// </summary>
         /// <param name="method">The method.</param>
         /// <param name="path">The path.</param>
         /// <param name="host">The host.</param>
-        public ApplicationRouteAttribute(HttpMethod method, string path, string host) {
+        public RouteAttribute(HttpMethod method, string path, string host) {
             this.method = method;
             this.path = path;
             this.host = host;

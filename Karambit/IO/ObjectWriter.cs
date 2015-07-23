@@ -1,6 +1,9 @@
 ﻿using Karambit.Serialization;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Text;
 
 namespace Karambit.IO
@@ -38,7 +41,7 @@ namespace Karambit.IO
         }
         #endregion
 
-        #region Methods        
+        #region Methods
         /// <summary>
         /// Writes a byte to the stream.
         /// </summary>
@@ -214,7 +217,7 @@ namespace Karambit.IO
         /// <param name="str">The string.</param>
         /// <param name="format">The format.</param>
         /// <param name="size">The size.</param>
-        public void WriteString(string str, StringFormat format, int size=0) {
+        public void WriteString(string str, StringFormat format=StringFormat.LengthEncoded, int size=0) {
             if (format == StringFormat.FixedSize)
                 WriteFixedString(str, size);
             else if (format == StringFormat.LengthEncoded)
@@ -301,15 +304,6 @@ namespace Karambit.IO
         }
 
         /// <summary>
-        /// Writes the object of the specified type.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="obj">The object.</param>
-        public void WriteObject<T>(T obj) {
-            WriteObject(obj);
-        }
-
-        /// <summary>
         /// Writes the object.
         /// </summary>
         /// <param name="obj">The object.</param>
@@ -334,6 +328,8 @@ namespace Karambit.IO
                 WriteFloat((float)obj);
             else if (obj is bool)
                 WriteBool((bool)obj);
+            else if (obj is string)
+                WriteString((string)obj);
             else if (obj is ISerializable)
                 ((ISerializable)obj).Serialize(this);
             else
@@ -341,7 +337,52 @@ namespace Karambit.IO
         }
 
         private void WriteObjectStructured(object obj) {
+            // get type
+            Type type = obj.GetType();
+            Dictionary<string, object> members = new Dictionary<string, object>();
 
+            // handle lists and dictionaries
+            if (type is IDictionary) {
+                IDictionary dict = (IDictionary)obj;
+                WriteInt(dict.Count);
+
+                foreach (KeyValuePair<string, object> kv in dict) {
+                    WriteString(kv.Key);
+                    WriteObject(kv.Value);
+                }
+
+                return;
+            } else if (type is IList) {
+                IList list = (IList)obj;
+                WriteInt(list.Count);
+
+                foreach (object v in list) {
+                    WriteObject(v);
+                }
+
+                return;
+            } 
+
+            // get members
+            foreach (FieldInfo info in type.GetFields())
+                members.Add(info.Name, info.GetValue(obj));
+
+            foreach (PropertyInfo info in type.GetProperties())
+                members.Add(info.Name, info.GetValue(obj));
+
+            // write
+            foreach (KeyValuePair<string, object> member in members) {
+                // key
+                WriteString(member.Key);
+
+                // value
+                if (member.Value is IDictionary)
+                    WriteObjectStructured(member.Value);
+                else if (member.Value is IList)
+                    WriteObjectStructured(member.Value);
+                else
+                    WriteObject(member.Value);
+            }
         }
         #endregion
 
