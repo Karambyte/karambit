@@ -21,6 +21,7 @@ namespace Karambit.Web
         private HttpServer server;
         private string name;
         private List<Route> routes;
+        private List<Middleware> middleware;
         private Logger logger;
 
         private static App currentApp = null;
@@ -105,6 +106,21 @@ namespace Karambit.Web
         private void HandleRequest(object sender, RequestEventArgs e) {
             Route route = null;
 
+            // name header
+            e.Response.Headers["X-Application-Name"] = name;
+
+            // middleware
+            foreach (Middleware mware in middleware) {
+                // invoke middleware
+                bool handled = (bool)mware.Function.Invoke(null, new object[] { e.Request, e.Response });
+
+                // check if handed
+                if (handled) {
+                    logger.Log(LogLevel.Information, "http", e.Request.Method + " " + e.Request.Path);
+                    return;
+                }
+            }
+
             // find route
             foreach (Route r in routes) {
                 if (r.Path == e.Request.Path && r.Method == e.Request.Method) {
@@ -113,17 +129,13 @@ namespace Karambit.Web
                 }
             }
 
-            // name header
-            e.Response.Headers["X-Application-Name"] = name;
-
             // check found
             if (route == null) {
                 e.Response.StatusCode = HttpStatus.NotFound;
                 e.Response.Write("Cannot " + e.Request.Method + " " + e.Request.Path);
 
                 // log
-                logger.Log(LogLevel.Error, "http", e.Request.Method + " " + e.Request.Path);
-                return;
+                goto fail;
             }
 
             // parameters
@@ -145,8 +157,7 @@ namespace Karambit.Web
                     e.Response.StatusCode = HttpStatus.BadRequest;
                     e.Response.Write("The parameter " + info.Name + " is missing from the request");
 
-                    logger.Log(LogLevel.Error, "http", e.Request.Method + " " + e.Request.Path);
-                    return;
+                    goto fail;
                 } else if (info.HasDefaultValue && !hasParameter) {
                     // missing parameter has default value
                     parameterValues[i] = info.DefaultValue;
@@ -161,6 +172,11 @@ namespace Karambit.Web
 
             // invoke
             route.Function.Invoke(null, parameterValues);
+            return;
+
+            // fail message
+            fail:
+            logger.Log(LogLevel.Error, "http", e.Request.Method + " " + e.Request.Path);
         }
 
         /// <summary>
@@ -194,7 +210,7 @@ namespace Karambit.Web
         }
 
         /// <summary>
-        /// Adds all routes from the specified assembly.
+        /// Adds all routes and middleware from the specified assembly.
         /// </summary>
         /// <param name="assembly">The assembly.</param>
         public void Add(Assembly assembly) {
@@ -202,10 +218,15 @@ namespace Karambit.Web
             foreach (Type t in assembly.GetTypes()) {
                 // get all methods
                 foreach (MethodInfo method in t.GetMethods()) {
-                    Attribute att = method.GetCustomAttribute(typeof(RouteAttribute));
+                    // ignore non-static methods
+                    if (!method.IsStatic)
+                        continue;
+
+                    Attribute routeAtt = method.GetCustomAttribute(typeof(RouteAttribute));
+                    Attribute middlewareAtt = method.GetCustomAttribute(typeof(MiddlewareAttribute));
 
                     // if static and has route attribute, add
-                    if (method.IsStatic && att != null) {
+                    if (routeAtt != null) {
                         // get parameters
                         ParameterInfo[] parameters = method.GetParameters();
 
@@ -216,18 +237,36 @@ namespace Karambit.Web
                         else if (parameters[1].ParameterType != typeof(HttpResponse))
                             throw new Exception("The route " + method.ToString() + " must have a HttpResponse object as it's second parameter");
 
-                        routes.Add(new Route((RouteAttribute)att, method));
+                        routes.Add(new Route((RouteAttribute)routeAtt, method));
+                    }
+
+                    // if static and has middleware attribute, add
+                    if (middlewareAtt != null) {
+                        // get parameters
+                        ParameterInfo[] parameters = method.GetParameters();
+
+                        if (parameters.Length != 2)
+                            throw new Exception("The middleware " + method.ToString() + " must only have 2 parameters parameters");
+                        else if (parameters[0].ParameterType != typeof(HttpRequest))
+                            throw new Exception("The middleware " + method.ToString() + " must have a HttpRequest object as it's first parameter");
+                        else if (parameters[1].ParameterType != typeof(HttpResponse))
+                            throw new Exception("The middleware " + method.ToString() + " must have a HttpResponse object as it's second parameter");
+                        else if (method.ReturnType != typeof(bool))
+                            throw new Exception("The middleware " + method.ToString() + " must return a boolean");
+
+                        middleware.Add(new Middleware((MiddlewareAttribute)middlewareAtt, method));
                     }
                 }
             }
         }
 
         /// <summary>
-        /// Removes all reoutes from the specified assembly.
+        /// Removes all reoutes and middleware from the specified assembly.
         /// </summary>
         /// <param name="assembly">The assembly.</param>
         public void Remove(Assembly assembly) {
             List<Route> removeRoutes = new List<Route>();
+            List<Middleware> removeMiddleware = new List<Middleware>();
 
             // find all routes with the specified assembly
             foreach (Route route in routes) {
@@ -235,9 +274,17 @@ namespace Karambit.Web
                     removeRoutes.Add(route);
             }
 
+            // find all middleware with the specified assembly
+            foreach (Middleware mware in middleware) {
+                if (mware.Assembly == assembly)
+                    removeMiddleware.Add(mware);
+            }
+
             // remove all
             foreach (Route route in removeRoutes)
                 routes.Remove(route);
+            foreach (Middleware mware in removeMiddleware)
+                middleware.Remove(mware);
         }
 
         /// <summary>
@@ -286,8 +333,9 @@ namespace Karambit.Web
             this.server.Error += HandleError;
             this.server.Serializer = new JSONSerializer(SerializerFormat.Minimized);
 
-            // routes
+            // routes and middleware
             this.routes = new List<Route>();
+            this.middleware = new List<Middleware>();
 
             // default name.
             this.name = DefaultName;

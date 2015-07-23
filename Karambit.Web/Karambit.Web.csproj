@@ -43,6 +43,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.cs" />
+    <Compile Include="Middleware.cs" />
+    <Compile Include="MiddlewareAttribute.cs" />
     <Compile Include="Route.cs" />
     <Compile Include="RouteAttribute.cs" />
     <Compile Include="HTTP\ErrorEventArgs.cs" />
