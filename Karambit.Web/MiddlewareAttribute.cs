@@ -10,9 +10,11 @@ namespace Karambit.Web
         #region Properties
         #endregion
 
-        #region Constructors
+        #region Constructors        
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MiddlewareAttribute"/> class.
+        /// </summary>
         public MiddlewareAttribute() {
-
         }
         #endregion
     }

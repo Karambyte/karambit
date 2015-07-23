@@ -11,7 +11,7 @@ namespace Karambit.Web
     public delegate void StartedEventHandler(object sender, EventArgs e);
     public delegate void StoppedEventHandler(object sender, EventArgs e);
 
-    public class App
+    public class Application
     {
         #region Constants
         private const string DefaultName = "Untitled Application";
@@ -24,7 +24,7 @@ namespace Karambit.Web
         private List<Middleware> middleware;
         private Logger logger;
 
-        private static App currentApp = null;
+        private static Application currentApp = null;
         #endregion
 
         #region Properties
@@ -69,7 +69,7 @@ namespace Karambit.Web
         /// Gets the currently executing application (if any).
         /// </summary>
         /// <value>The current app.</value>
-        public static App Current {
+        public static Application Current {
             get {
                 return currentApp;
             }
@@ -292,7 +292,7 @@ namespace Karambit.Web
         /// </summary>
         /// <param name="app">The application.</param>
         /// <param name="args">The arguments.</param>
-        public static void Run(App app, string[] args) {
+        public static void Run(Application app, string[] args) {
             // deployment
             app.Deployment = (System.Diagnostics.Debugger.IsAttached) ? Deployment.Production : Deployment.Release;
 
@@ -316,17 +316,17 @@ namespace Karambit.Web
         /// Runs the specified application.
         /// </summary>
         /// <param name="app">The application.</param>
-        public static void Run(App app) {
+        public static void Run(Application app) {
             Run(app, new string[] { });
         }
         #endregion
 
         #region Constructors
         /// <summary>
-        /// Initializes a new instance of the <see cref="App"/> class.
+        /// Initializes a new instance of the <see cref="Application"/> class.
         /// </summary>
         /// <param name="port">The port.</param>
-        public App(int port) {
+        public Application(int port) {
             // server
             this.server = new HttpServer(port);
             this.server.Request += HandleRequest;
@@ -351,45 +351,45 @@ namespace Karambit.Web
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="App"/> class.
+        /// Initializes a new instance of the <see cref="Application"/> class.
         /// </summary>
         /// <param name="port">The port.</param>
         /// <param name="name">The name.</param>
-        public App(int port, string name)
+        public Application(int port, string name)
             : this(port) {
             this.name = name;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="App"/> class.
+        /// Initializes a new instance of the <see cref="Application"/> class.
         /// </summary>
         /// <param name="port">The port.</param>
         /// <param name="name">The name.</param>
         /// <param name="logger">The logger.</param>
-        public App(int port, string name, Logger logger)
+        public Application(int port, string name, Logger logger)
             : this(port, name) {
             this.logger = logger;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="App"/> class.
+        /// Initializes a new instance of the <see cref="Application"/> class.
         /// </summary>
         /// <param name="port">The port.</param>
         /// <param name="name">The name.</param>
         /// <param name="deployment">The deployment.</param>
-        public App(int port, string name, Deployment deployment)
+        public Application(int port, string name, Deployment deployment)
             : this(port, name) {
             this.Deployment = deployment;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="App"/> class.
+        /// Initializes a new instance of the <see cref="Application"/> class.
         /// </summary>
         /// <param name="port">The port.</param>
         /// <param name="name">The name.</param>
         /// <param name="logger">The logger.</param>
         /// <param name="deployment">The deployment.</param>
-        public App(int port, string name, Logger logger, Deployment deployment)
+        public Application(int port, string name, Logger logger, Deployment deployment)
             : this(port, name, logger) {
             this.Deployment = deployment;
         }
