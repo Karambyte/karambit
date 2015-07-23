@@ -19,5 +19,11 @@ namespace Karambit.Net
         /// </summary>
         /// <value><c>true</c> if running; otherwise, <c>false</c>.</value>
         bool Running { get; }
+
+        /// <summary>
+        /// Gets the port the server is running on.
+        /// </summary>
+        /// <value>The port.</value>
+        int Port { get; }
     }
 }
