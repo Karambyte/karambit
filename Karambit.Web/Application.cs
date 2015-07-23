@@ -107,7 +107,7 @@ namespace Karambit.Web
             Route route = null;
 
             // name header
-            e.Response.Headers["X-Application-Name"] = name;
+            e.Response.Headers["X-Karambit-App"] = name;
 
             // middleware
             foreach (Middleware mware in middleware) {
