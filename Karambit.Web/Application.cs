@@ -232,7 +232,8 @@ namespace Karambit.Web
         /// Runs the specified application.
         /// </summary>
         /// <param name="app">The application.</param>
-        public static void Run(Application app) {
+        /// <param name="args">The arguments.</param>
+        public static void Run(Application app, string[] args) {
             // deployment
             app.Deployment = (System.Diagnostics.Debugger.IsAttached) ? Deployment.Production : Deployment.Release;
 
@@ -247,6 +248,14 @@ namespace Karambit.Web
             // wait
             while (true)
                 Console.ReadLine();
+        }
+
+        /// <summary>
+        /// Runs the specified application.
+        /// </summary>
+        /// <param name="app">The application.</param>
+        public static void Run(Application app) {
+            Run(app, new string[] { });
         }
         #endregion
 
