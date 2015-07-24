@@ -23,7 +23,7 @@ namespace Karambit.Web
         /// <value>The deployment.</value>
         public override Deployment Deployment {
             set {
-                this.deployment = value;
+                base.Deployment = value;
                 this.server.Deployment = value;
 
                 // use tidy JSON in production
@@ -76,8 +76,8 @@ namespace Karambit.Web
 
                 // check if handed
                 if (handled) {
-                    if (deployment == Deployment.Production)
-                        logger.Log(LogLevel.Information, "http", e.Request.Method + " " + e.Request.Path);
+                    if (Deployment == Deployment.Production)
+                        Logger.Log(LogLevel.Information, "http", e.Request.Method + " " + e.Request.Path);
                     return;
                 }
             }
@@ -129,8 +129,8 @@ namespace Karambit.Web
             }
 
             // log
-            if (deployment == Deployment.Production)
-                logger.Log(LogLevel.Information, "http", e.Request.Method + " " + e.Request.Path);
+            if (Deployment == Deployment.Production)
+                Logger.Log(LogLevel.Information, "http", e.Request.Method + " " + e.Request.Path);
 
             // invoke
             route.Function.Invoke(null, parameterValues);
@@ -138,8 +138,8 @@ namespace Karambit.Web
 
             // fail message
             fail:
-            if (deployment == Deployment.Production)
-                logger.Log(LogLevel.Error, "http", e.Request.Method + " " + e.Request.Path);
+            if (Deployment == Deployment.Production)
+                Logger.Log(LogLevel.Error, "http", e.Request.Method + " " + e.Request.Path);
         }
 
         /// <summary>
@@ -149,8 +149,8 @@ namespace Karambit.Web
         /// <param name="e">The <see cref="ErrorEventArgs"/> instance containing the event data.</param>
         private void HandleError(object sender, ErrorEventArgs e) {
             // log
-            if (deployment == Deployment.Production)
-                logger.Log(LogLevel.Error, "http", e.Exception.Method + " " + e.Exception.Path);
+            if (Deployment == Deployment.Production)
+                Logger.Log(LogLevel.Error, "http", e.Exception.Method + " " + e.Exception.Path);
         }
 
         /// <summary>

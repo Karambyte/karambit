@@ -9,9 +9,10 @@ namespace Karambit
     public abstract class Application : IApplication
     {
         #region Fields
-        protected Deployment deployment = Deployment.Release;
-        protected Logger logger = null;
+        private Deployment deployment = Deployment.Release;
+        private Logger logger = null;
         protected string name = "untitledapp";
+        private bool running = false;
 
         private static IApplication currentApp;
         #endregion
@@ -29,6 +30,51 @@ namespace Karambit
                 deployment = value;
             }
         }
+        
+        /// <summary>
+        /// Gets a value indicating whether this <see cref="Application"/> is running.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if running; otherwise, <c>false</c>.
+        /// </value>
+        public bool Running {
+            get {
+                return running;
+            }
+        }
+        /// <summary>
+        /// Gets the logger.
+        /// </summary>
+        /// <value>The logger.</value>
+        public Logger Logger {
+            get {
+                return logger;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the name.
+        /// </summary>
+        /// <value>The name.</value>
+        public string Name {
+            get {
+                return name;
+            }
+            set {
+                this.name = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets the currently executing application (if any).
+        /// </summary>
+        /// <value>The current app.</value>
+        public static IApplication Current {
+            get {
+                return currentApp;
+            }
+        }
+        #endregion
 
         #region Events
         public event StartedEventHandler Started;
@@ -51,45 +97,16 @@ namespace Karambit
         }
         #endregion
 
-        /// <summary>
-        /// Gets the logger.
-        /// </summary>
-        /// <value>The logger.</value>
-        public virtual Logger Logger {
-            get {
-                return logger;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the name.
-        /// </summary>
-        /// <value>The name.</value>
-        public virtual string Name {
-            get {
-                return name;
-            }
-            set {
-                this.name = value;
-            }
-        }
-
-        /// <summary>
-        /// Gets the currently executing application (if any).
-        /// </summary>
-        /// <value>The current app.</value>
-        public static IApplication Current {
-            get {
-                return currentApp;
-            }
-        }
-        #endregion
-
         #region Methods        
         /// <summary>
         /// Starts this application.
         /// </summary>
         public virtual void Start() {
+            if (running)
+                return;
+
+            running = true;
+
             // invoke event
             OnStarted();
         }
@@ -98,6 +115,11 @@ namespace Karambit
         /// Stops this application.
         /// </summary>
         public virtual void Stop() {
+            if (!running)
+                return;
+
+            running = false;
+
             // invoke event
             OnStopped();
         }
@@ -128,12 +150,18 @@ namespace Karambit
 
             // stop on process exit
             AppDomain.CurrentDomain.ProcessExit += delegate(object sender, EventArgs e) {
-                app.Stop();
+                if (app.Running)
+                    app.Stop();
             };
 
             // loop
-            while (true)
-                System.Threading.Thread.Sleep(0);
+            while (true) {
+                string command = Console.ReadLine();
+                if (command == "quit" || command == "exit")
+                    return;
+                else if (command == "clear")
+                    Console.Clear();
+            }
         }
         #endregion
 
