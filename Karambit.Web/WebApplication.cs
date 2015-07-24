@@ -174,13 +174,13 @@ namespace Karambit.Web
                         ParameterInfo[] parameters = method.GetParameters();
 
                         if ((routeAtt != null && parameters.Length < 2) || (middlewareAtt != null && parameters.Length != 2)) {
-                            Logger.Log(LogLevel.Error, "app", "The " + attEntity + " " + methodEntity + " requires at least 2 parameters");
+                            Log(LogLevel.Error, "The " + attEntity + " " + methodEntity + " requires at least 2 parameters");
                             continue;
                         } else if (parameters[0].ParameterType != typeof(HttpRequest)) {
-                            Logger.Log(LogLevel.Error, "app", "The " + attEntity + " " + methodEntity + " must have a HttpRequest object as it's first parameter");
+                            Log(LogLevel.Error, "The " + attEntity + " " + methodEntity + " must have a HttpRequest object as it's first parameter");
                             continue;
                         } else if (parameters[1].ParameterType != typeof(HttpResponse)) {
-                            Logger.Log(LogLevel.Error, "app", "The " + attEntity + " " + methodEntity + " must have a HttpResponse object as it's second parameter");
+                            Log(LogLevel.Error, "The " + attEntity + " " + methodEntity + " must have a HttpResponse object as it's second parameter");
                             continue;
                         }
 
