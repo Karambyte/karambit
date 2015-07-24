@@ -10,7 +10,7 @@ namespace Karambit.Web.HTTP
         private HttpMethod method;
         #endregion
 
-        #region Properties        
+        #region Properties
         /// <summary>
         /// Gets the status code that reperesents the error.
         /// </summary>
@@ -48,7 +48,7 @@ namespace Karambit.Web.HTTP
         }
         #endregion
 
-        #region Constructors        
+        #region Constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpException"/> class.
         /// </summary>

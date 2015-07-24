@@ -224,37 +224,30 @@ namespace Karambit.Web
 
                     Attribute routeAtt = method.GetCustomAttribute(typeof(RouteAttribute));
                     Attribute middlewareAtt = method.GetCustomAttribute(typeof(MiddlewareAttribute));
+                    Attribute att = (routeAtt != null) ? routeAtt : ((middlewareAtt != null) ? middlewareAtt : null);
+                    string attEntity = (routeAtt != null) ? "route" : ((middlewareAtt != null) ? "middleware" : null);
+                    string methodEntity = t.Name + "." + method.Name;
 
-                    // if static and has route attribute, add
-                    if (routeAtt != null) {
+                    // if one attribute is found
+                    if (att != null) {
                         // get parameters
                         ParameterInfo[] parameters = method.GetParameters();
 
-                        if (parameters.Length < 2)
-                            throw new Exception("The route " + method.ToString() + " requires at least 2 parameters");
-                        else if (parameters[0].ParameterType != typeof(HttpRequest))
-                            throw new Exception("The route " + method.ToString() + " must have a HttpRequest object as it's first parameter");
-                        else if (parameters[1].ParameterType != typeof(HttpResponse))
-                            throw new Exception("The route " + method.ToString() + " must have a HttpResponse object as it's second parameter");
+                        if ((routeAtt != null && parameters.Length < 2) || (middlewareAtt != null && parameters.Length != 2)) {
+                            Logger.Log(LogLevel.Error, "app", "The " + attEntity + " " + methodEntity + " requires at least 2 parameters");
+                            continue;
+                        } else if (parameters[0].ParameterType != typeof(HttpRequest)) {
+                            Logger.Log(LogLevel.Error, "app", "The " + attEntity + " " + methodEntity + " must have a HttpRequest object as it's first parameter");
+                            continue;
+                        } else if (parameters[1].ParameterType != typeof(HttpResponse)) {
+                            Logger.Log(LogLevel.Error, "app", "The " + attEntity + " " + methodEntity + " must have a HttpResponse object as it's second parameter");
+                            continue;
+                        }
 
-                        routes.Add(new Route((RouteAttribute)routeAtt, method));
-                    }
-
-                    // if static and has middleware attribute, add
-                    if (middlewareAtt != null) {
-                        // get parameters
-                        ParameterInfo[] parameters = method.GetParameters();
-
-                        if (parameters.Length != 2)
-                            throw new Exception("The middleware " + method.ToString() + " must only have 2 parameters parameters");
-                        else if (parameters[0].ParameterType != typeof(HttpRequest))
-                            throw new Exception("The middleware " + method.ToString() + " must have a HttpRequest object as it's first parameter");
-                        else if (parameters[1].ParameterType != typeof(HttpResponse))
-                            throw new Exception("The middleware " + method.ToString() + " must have a HttpResponse object as it's second parameter");
-                        else if (method.ReturnType != typeof(bool))
-                            throw new Exception("The middleware " + method.ToString() + " must return a boolean");
-
-                        middleware.Add(new Middleware((MiddlewareAttribute)middlewareAtt, method));
+                        if (att is RouteAttribute)
+                            routes.Add(new Route((RouteAttribute)att, method));
+                        else
+                            middleware.Add(new Middleware((MiddlewareAttribute)att, method));
                     }
                 }
             }

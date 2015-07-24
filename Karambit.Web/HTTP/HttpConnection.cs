@@ -168,7 +168,7 @@ namespace Karambit.Web.HTTP
         }
         #endregion
 
-        #region Constructors        
+        #region Constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpConnection"/> class.
         /// </summary>
@@ -180,6 +180,7 @@ namespace Karambit.Web.HTTP
             this.address = ((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString();
             this.server = server;
             this.id = id;
+            this.protocol = HttpProtocol.HTTP;
 
             // thread
             this.thread = new Thread(new ThreadStart(Process));
