@@ -76,7 +76,8 @@ namespace Karambit.Web
 
                 // check if handed
                 if (handled) {
-                    logger.Log(LogLevel.Information, "http", e.Request.Method + " " + e.Request.Path);
+                    if (deployment == Deployment.Production)
+                        logger.Log(LogLevel.Information, "http", e.Request.Method + " " + e.Request.Path);
                     return;
                 }
             }
@@ -128,7 +129,8 @@ namespace Karambit.Web
             }
 
             // log
-            logger.Log(LogLevel.Information, "http", e.Request.Method + " " + e.Request.Path);
+            if (deployment == Deployment.Production)
+                logger.Log(LogLevel.Information, "http", e.Request.Method + " " + e.Request.Path);
 
             // invoke
             route.Function.Invoke(null, parameterValues);
@@ -136,7 +138,8 @@ namespace Karambit.Web
 
             // fail message
             fail:
-            logger.Log(LogLevel.Error, "http", e.Request.Method + " " + e.Request.Path);
+            if (deployment == Deployment.Production)
+                logger.Log(LogLevel.Error, "http", e.Request.Method + " " + e.Request.Path);
         }
 
         /// <summary>
@@ -146,7 +149,8 @@ namespace Karambit.Web
         /// <param name="e">The <see cref="ErrorEventArgs"/> instance containing the event data.</param>
         private void HandleError(object sender, ErrorEventArgs e) {
             // log
-            logger.Log(LogLevel.Error, "http", e.Exception.Method + " " + e.Exception.Path);
+            if (deployment == Deployment.Production)
+                logger.Log(LogLevel.Error, "http", e.Exception.Method + " " + e.Exception.Path);
         }
 
         /// <summary>
