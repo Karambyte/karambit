@@ -8,55 +8,22 @@ using System.Reflection;
 
 namespace Karambit.Web
 {
-    public delegate void StartedEventHandler(object sender, EventArgs e);
-    public delegate void StoppedEventHandler(object sender, EventArgs e);
-
-    public class Application
+    public class WebApplication : Application
     {
-        #region Constants
-        private const string DefaultName = "Untitled Application";
-        #endregion
-
         #region Fields
         private HttpServer server;
-        private string name;
-        private List<Route> routes;
-        private List<Middleware> middleware;
-        private Logger logger;
-
-        private static Application currentApp = null;
+        private List<Route> routes = new List<Route>();
+        private List<Middleware> middleware = new List<Middleware>();
         #endregion
 
         #region Properties
         /// <summary>
-        /// Gets the name.
-        /// </summary>
-        /// <value>The name.</value>
-        public string Name {
-            get {
-                return name;
-            }
-        }
-
-        /// <summary>
-        /// Gets the logger.
-        /// </summary>
-        /// <value>The logger.</value>
-        public Logger Logger {
-            get {
-                return logger;
-            }
-        }
-
-        /// <summary>
         /// Gets or sets the deployment.
         /// </summary>
         /// <value>The deployment.</value>
-        public Deployment Deployment {
-            get {
-                return server.Deployment;
-            }
+        public override Deployment Deployment {
             set {
+                this.deployment = value;
                 this.server.Deployment = value;
 
                 // use tidy JSON in production
@@ -64,40 +31,33 @@ namespace Karambit.Web
                     ((JSONSerializer)this.server.Serializer).Format = (value == Deployment.Production) ? SerializerFormat.Tidy : SerializerFormat.Minimized;
             }
         }
-
-        /// <summary>
-        /// Gets the currently executing application (if any).
-        /// </summary>
-        /// <value>The current app.</value>
-        public static Application Current {
-            get {
-                return currentApp;
-            }
-        }
         #endregion
 
-        #region Events
-        public event StartedEventHandler Started;
-        public event StoppedEventHandler Stopped;
-
+        #region Methods        
         /// <summary>
         /// Called when the application starts.
         /// </summary>
-        protected virtual void OnStarted() {
-            if (Started != null)
-                Started(this, new EventArgs());
+        protected override void OnStarted() {
+            // log
+            Log(LogLevel.Information, "started listening on port " + server.Port);
+
+            // start server
+            server.Start();
+            base.OnStarted();
         }
 
         /// <summary>
         /// Called when the application stops.
         /// </summary>
-        protected virtual void OnStopped() {
-            if (Stopped != null)
-                Stopped(this, new EventArgs());
-        }
-        #endregion
+        protected override void OnStopped() {
+            // log
+            Log(LogLevel.Information, "stopped listening on port " + server.Port);
 
-        #region Methods
+            // stop server
+            server.Stop();
+            base.OnStopped();
+        }
+
         /// <summary>
         /// Handles the internal request.
         /// </summary>
@@ -190,26 +150,6 @@ namespace Karambit.Web
         }
 
         /// <summary>
-        /// Starts this application.
-        /// </summary>
-        public void Start() {
-            server.Start();
-
-            // invoke event
-            OnStarted();
-        }
-
-        /// <summary>
-        /// Stops this application.
-        /// </summary>
-        public void Stop() {
-            server.Stop();
-
-            // invoke event
-            OnStopped();
-        }
-
-        /// <summary>
         /// Adds all routes and middleware from the specified assembly.
         /// </summary>
         /// <param name="assembly">The assembly.</param>
@@ -279,111 +219,50 @@ namespace Karambit.Web
             foreach (Middleware mware in removeMiddleware)
                 middleware.Remove(mware);
         }
-
-        /// <summary>
-        /// Runs the specified application.
-        /// </summary>
-        /// <param name="app">The application.</param>
-        /// <param name="args">The arguments.</param>
-        public static void Run(Application app, string[] args) {
-            // deployment
-            app.Deployment = (System.Diagnostics.Debugger.IsAttached) ? Deployment.Production : Deployment.Release;
-
-            // start
-            app.Start();
-
-            // add stop handler
-            AppDomain.CurrentDomain.ProcessExit += delegate(object sender, EventArgs e) {
-                app.Stop();
-            };
-
-            // setup current
-            currentApp = app;
-
-            // wait
-            while (true)
-                Console.ReadLine();
-        }
-
-        /// <summary>
-        /// Runs the specified application.
-        /// </summary>
-        /// <param name="app">The application.</param>
-        public static void Run(Application app) {
-            Run(app, new string[] { });
-        }
         #endregion
 
         #region Constructors
         /// <summary>
-        /// Initializes a new instance of the <see cref="Application"/> class.
+        /// Initializes a new instance of the <see cref="WebApplication"/> class.
         /// </summary>
         /// <param name="port">The port.</param>
-        public Application(int port) {
+        public WebApplication(int port) 
+            : base() {
             // server
             this.server = new HttpServer(port);
             this.server.Request += HandleRequest;
             this.server.Error += HandleError;
             this.server.Serializer = new JSONSerializer(SerializerFormat.Minimized);
 
-            // routes and middleware
-            this.routes = new List<Route>();
-            this.middleware = new List<Middleware>();
+            // search for routes
+            Add(Assembly.GetEntryAssembly());
+        }
 
-            // default name.
-            this.name = DefaultName;
-
-            // default deployment
-            Deployment = Deployment.Release;
-
-            // default logger
-            this.logger = new Logger();
+        /// <summary>
+        /// Initializes a new instance of the <see cref="WebApplication"/> class.
+        /// </summary>
+        /// <param name="port">The port.</param>
+        /// <param name="name">The name.</param>
+        public WebApplication(int port, string name)
+            : base(name) {
+            // server
+            this.server = new HttpServer(port);
+            this.server.Request += HandleRequest;
+            this.server.Error += HandleError;
+            this.server.Serializer = new JSONSerializer(SerializerFormat.Minimized);
 
             // search for routes
             Add(Assembly.GetEntryAssembly());
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Application"/> class.
-        /// </summary>
-        /// <param name="port">The port.</param>
-        /// <param name="name">The name.</param>
-        public Application(int port, string name)
-            : this(port) {
-            this.name = name;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Application"/> class.
-        /// </summary>
-        /// <param name="port">The port.</param>
-        /// <param name="name">The name.</param>
-        /// <param name="logger">The logger.</param>
-        public Application(int port, string name, Logger logger)
-            : this(port, name) {
-            this.logger = logger;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Application"/> class.
+        /// Initializes a new instance of the <see cref="WebApplication"/> class.
         /// </summary>
         /// <param name="port">The port.</param>
         /// <param name="name">The name.</param>
         /// <param name="deployment">The deployment.</param>
-        public Application(int port, string name, Deployment deployment)
+        public WebApplication(int port, string name, Deployment deployment)
             : this(port, name) {
-            this.Deployment = deployment;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Application"/> class.
-        /// </summary>
-        /// <param name="port">The port.</param>
-        /// <param name="name">The name.</param>
-        /// <param name="logger">The logger.</param>
-        /// <param name="deployment">The deployment.</param>
-        public Application(int port, string name, Logger logger, Deployment deployment)
-            : this(port, name, logger) {
             this.Deployment = deployment;
         }
         #endregion

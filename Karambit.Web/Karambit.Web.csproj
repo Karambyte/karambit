@@ -42,7 +42,7 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Application.cs" />
+    <Compile Include="WebApplication.cs" />
     <Compile Include="HTTP\HttpProtocol.cs" />
     <Compile Include="Middleware.cs" />
     <Compile Include="MiddlewareAttribute.cs" />
