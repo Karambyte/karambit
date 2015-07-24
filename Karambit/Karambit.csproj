@@ -42,6 +42,7 @@
     <Compile Include="IO\StringFormat.cs" />
     <Compile Include="Logging\Logger.cs" />
     <Compile Include="Logging\LogLevel.cs" />
+    <Compile Include="Logging\LogMessage.cs" />
     <Compile Include="Net\IServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Serialization\EmptySerializer.cs" />
