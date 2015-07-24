@@ -17,7 +17,7 @@ namespace Karambit.Logging
         /// <param name="channel">The channel.</param>
         public void Block(string channel) {
             if (!blockedChannels.Contains(channel))
-                this.blockedChannels.Add(channel);
+                blockedChannels.Add(channel);
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace Karambit.Logging
         }
 
         /// <summary>
-        /// Subscribes the specified observer.
+        /// Subscribes the specified observer to outgoing log messages.
         /// </summary>
         /// <param name="observer">The observer.</param>
         /// <returns></returns>
