@@ -1,5 +1,7 @@
 ﻿using Karambit.Logging;
+using Karambit.Net;
 using System;
+using System.Collections.Generic;
 
 namespace Karambit
 {
@@ -12,6 +14,7 @@ namespace Karambit
         private Deployment deployment = Deployment.Release;
         protected string name = "untitledapp";
         private bool running = false;
+        protected List<IServer> servers = new List<IServer>();
 
         private static Logger logger;
         private static IApplication currentApp;
@@ -110,6 +113,10 @@ namespace Karambit
 
             running = true;
 
+            // start servers
+            foreach (IServer server in servers)
+                server.Start();
+
             // invoke event
             OnStarted();
         }
@@ -123,6 +130,10 @@ namespace Karambit
 
             running = false;
 
+            // stop servers
+            foreach (IServer server in servers)
+                server.Stop();
+
             // invoke event
             OnStopped();
         }
@@ -134,6 +145,22 @@ namespace Karambit
         /// <param name="msg">The message.</param>
         public virtual void Log(LogLevel level, string msg) {
             Logger.Log(level, name.ToLower(), msg);
+        }
+
+        /// <summary>
+        /// Attaches the specified server to the application.
+        /// </summary>
+        /// <param name="server">The server.</param>
+        public virtual void Attach(IServer server) {
+            servers.Add(server);
+        }
+
+        /// <summary>
+        /// Detaches the specified server from the application.
+        /// </summary>
+        /// <param name="server">The server.</param>
+        public virtual void Detach(IServer server) {
+            servers.Remove(server);
         }
 
         /// <summary>

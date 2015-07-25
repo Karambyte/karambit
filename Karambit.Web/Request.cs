@@ -16,7 +16,11 @@ namespace Karambit.Web
         #region Constructors
         public Request(HttpRequest req)
             : base(req.Connection) {
-
+                this.headers = req.Headers;
+                this.method = req.Method;
+                this.path = req.Path;
+                this.parameters = req.Parameters;
+                this.version = req.Version;
         }
         #endregion
     }

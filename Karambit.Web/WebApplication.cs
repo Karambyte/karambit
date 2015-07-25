@@ -1,4 +1,5 @@
 ﻿using Karambit.Logging;
+using Karambit.Net;
 using Karambit.Serialization;
 using Karambit.Web.HTTP;
 using Karambit.Web.Serialization;
@@ -11,7 +12,6 @@ namespace Karambit.Web
     public class WebApplication : Application
     {
         #region Fields
-        private HttpServer server;
         private List<Route> routes = new List<Route>();
         private List<Middleware> middleware = new List<Middleware>();
         #endregion
@@ -24,40 +24,21 @@ namespace Karambit.Web
         public override Deployment Deployment {
             set {
                 base.Deployment = value;
-                this.server.Deployment = value;
 
-                // use tidy JSON in production
-                if (this.server.Serializer is JSONSerializer)
-                    ((JSONSerializer)this.server.Serializer).Format = (value == Deployment.Production) ? SerializerFormat.Tidy : SerializerFormat.Minimized;
+                foreach (IServer server in servers) {
+                    if (server is HttpServer) {
+                        HttpServer httpServer = (HttpServer)server;
+                        httpServer.Deployment = value;
+
+                        if (httpServer.Serializer is JSONSerializer)
+                            ((JSONSerializer)httpServer.Serializer).Format = (value == Deployment.Production) ? SerializerFormat.Tidy : SerializerFormat.Minimized;
+                    }
+                }
             }
         }
         #endregion
 
-        #region Methods        
-        /// <summary>
-        /// Called when the application starts.
-        /// </summary>
-        protected override void OnStarted() {
-            // log
-            Log(LogLevel.Information, "started listening on port " + server.Port);
-
-            // start server
-            server.Start();
-            base.OnStarted();
-        }
-
-        /// <summary>
-        /// Called when the application stops.
-        /// </summary>
-        protected override void OnStopped() {
-            // log
-            Log(LogLevel.Information, "stopped listening on port " + server.Port);
-
-            // stop server
-            server.Stop();
-            base.OnStopped();
-        }
-
+        #region Methods
         /// <summary>
         /// Handles the internal request.
         /// </summary>
@@ -240,10 +221,13 @@ namespace Karambit.Web
         public WebApplication(int port) 
             : base() {
             // server
-            this.server = new HttpServer(port);
-            this.server.Request += HandleRequest;
-            this.server.Error += HandleError;
-            this.server.Serializer = new JSONSerializer(SerializerFormat.Minimized);
+            HttpServer server = new HttpServer(port);
+            server.Request += HandleRequest;
+            server.Error += HandleError;
+            server.Serializer = new JSONSerializer(SerializerFormat.Minimized);
+
+            // attach
+            Attach(server);
 
             // search for routes
             Add(Assembly.GetEntryAssembly());
@@ -257,10 +241,13 @@ namespace Karambit.Web
         public WebApplication(int port, string name)
             : base(name) {
             // server
-            this.server = new HttpServer(port);
-            this.server.Request += HandleRequest;
-            this.server.Error += HandleError;
-            this.server.Serializer = new JSONSerializer(SerializerFormat.Minimized);
+            HttpServer server = new HttpServer(port);
+            server.Request += HandleRequest;
+            server.Error += HandleError;
+            server.Serializer = new JSONSerializer(SerializerFormat.Minimized);
+
+            // attach
+            Attach(server);
 
             // search for routes
             Add(Assembly.GetEntryAssembly());
