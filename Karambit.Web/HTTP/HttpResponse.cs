@@ -8,13 +8,13 @@ namespace Karambit.Web.HTTP
     public class HttpResponse
     {
         #region Fields
-        private HttpConnection connection;
-        private MemoryStream buffer;
-        private HttpStatus status;
-        private Dictionary<string, string> headers;
+        protected HttpConnection connection;
+        protected MemoryStream buffer;
+        protected HttpStatus status;
+        protected Dictionary<string, string> headers;
         #endregion
 
-        #region Properties        
+        #region Properties
         /// <summary>
         /// Gets the underlying connection.
         /// </summary>
@@ -94,7 +94,7 @@ namespace Karambit.Web.HTTP
         }
         #endregion
 
-        #region Methods             
+        #region Methods
         /// <summary>
         /// Clears the response buffer.
         /// </summary>

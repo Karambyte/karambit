@@ -10,7 +10,7 @@ namespace Karambit.Web
         private MiddlewareAttribute attribute;
         #endregion
 
-        #region Methods        
+        #region Methods
         /// <summary>
         /// Gets the attribute.
         /// </summary>

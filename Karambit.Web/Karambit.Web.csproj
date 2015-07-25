@@ -42,6 +42,8 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Request.cs" />
+    <Compile Include="Response.cs" />
     <Compile Include="WebApplication.cs" />
     <Compile Include="HTTP\HttpProtocol.cs" />
     <Compile Include="Middleware.cs" />

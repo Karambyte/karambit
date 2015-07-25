@@ -66,25 +66,29 @@ namespace Karambit.Web
         private void HandleRequest(object sender, RequestEventArgs e) {
             Route route = null;
 
+            // create request/response
+            Request req = new Request(e.Request);
+            Response res = new Response(e.Response);
+
             // name header
             e.Response.Headers["X-Karambit-App"] = name;
 
             // middleware
             foreach (Middleware mware in middleware) {
                 // invoke middleware
-                bool handled = (bool)mware.Function.Invoke(null, new object[] { e.Request, e.Response });
+                bool handled = (bool)mware.Function.Invoke(null, new object[] { req, res });
 
                 // check if handed
                 if (handled) {
                     if (Deployment == Deployment.Production)
-                        Logger.Log(LogLevel.Information, "http", e.Request.Method + " " + e.Request.Path);
+                        Logger.Log(LogLevel.Information, "http", req.Method + " " + req.Path);
                     return;
                 }
             }
 
             // find route
             foreach (Route r in routes) {
-                if (r.Path == e.Request.Path && r.Method == e.Request.Method) {
+                if (r.Path == req.Path && r.Method == req.Method) {
                     route = r;
                     break;
                 }
@@ -92,8 +96,8 @@ namespace Karambit.Web
 
             // check found
             if (route == null) {
-                e.Response.StatusCode = HttpStatus.NotFound;
-                e.Response.Write("Cannot " + e.Request.Method + " " + e.Request.Path);
+                res.StatusCode = HttpStatus.NotFound;
+                res.Write("Cannot " + req.Method + " " + req.Path);
 
                 // log
                 goto fail;
@@ -104,19 +108,19 @@ namespace Karambit.Web
             object[] parameterValues = new object[parameters.Length];
 
             // request and response
-            parameterValues[0] = e.Request;
-            parameterValues[1] = e.Response;
+            parameterValues[0] = req;
+            parameterValues[1] = res;
 
             // iterate
             for (int i = 2; i < parameters.Length; i++) {
                 // get parameter
                 ParameterInfo info = parameters[i];
-                bool hasParameter = e.Request.Parameters.ContainsKey(info.Name);
+                bool hasParameter = req.Parameters.ContainsKey(info.Name);
 
                 if (!info.HasDefaultValue && !hasParameter) {
                     // missing parameter and no default value
-                    e.Response.StatusCode = HttpStatus.BadRequest;
-                    e.Response.Write("The parameter " + info.Name + " is missing from the request");
+                    res.StatusCode = HttpStatus.BadRequest;
+                    res.Write("The parameter " + info.Name + " is missing from the request");
 
                     goto fail;
                 } else if (info.HasDefaultValue && !hasParameter) {
@@ -124,13 +128,13 @@ namespace Karambit.Web
                     parameterValues[i] = info.DefaultValue;
                 } else {
                     // parameter exists
-                    parameterValues[i] = e.Request.Parameters[info.Name];
+                    parameterValues[i] = req.Parameters[info.Name];
                 }
             }
 
             // log
             if (Deployment == Deployment.Production)
-                Logger.Log(LogLevel.Information, "http", e.Request.Method + " " + e.Request.Path);
+                Logger.Log(LogLevel.Information, "http", req.Method + " " + req.Path);
 
             // invoke
             route.Function.Invoke(null, parameterValues);
@@ -139,7 +143,7 @@ namespace Karambit.Web
             // fail message
             fail:
             if (Deployment == Deployment.Production)
-                Logger.Log(LogLevel.Error, "http", e.Request.Method + " " + e.Request.Path);
+                Logger.Log(LogLevel.Error, "http", req.Method + " " + req.Path);
         }
 
         /// <summary>
@@ -180,11 +184,14 @@ namespace Karambit.Web
                         if ((routeAtt != null && parameters.Length < 2) || (middlewareAtt != null && parameters.Length != 2)) {
                             Log(LogLevel.Error, "The " + attEntity + " " + methodEntity + " requires at least 2 parameters");
                             continue;
-                        } else if (parameters[0].ParameterType != typeof(HttpRequest)) {
-                            Log(LogLevel.Error, "The " + attEntity + " " + methodEntity + " must have a HttpRequest object as it's first parameter");
+                        } else if (parameters[0].ParameterType != typeof(Request)) {
+                            Log(LogLevel.Error, "The " + attEntity + " " + methodEntity + " must have a Request object as it's first parameter");
                             continue;
-                        } else if (parameters[1].ParameterType != typeof(HttpResponse)) {
-                            Log(LogLevel.Error, "The " + attEntity + " " + methodEntity + " must have a HttpResponse object as it's second parameter");
+                        } else if (parameters[1].ParameterType != typeof(Response)) {
+                            Log(LogLevel.Error, "The " + attEntity + " " + methodEntity + " must have a Response object as it's second parameter");
+                            continue;
+                        } else if (middlewareAtt != null && method.ReturnType != typeof(bool)) {
+                            Log(LogLevel.Error, "The " + attEntity + " " + methodEntity + " must return a boolean");
                             continue;
                         }
 

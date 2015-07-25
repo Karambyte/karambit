@@ -6,12 +6,12 @@ namespace Karambit.Web.HTTP
     public class HttpRequest
     {
         #region Fields
-        private HttpConnection connection;
-        private string path;
-        private HttpMethod method;
-        private string version;
-        private Dictionary<string, string> headers;
-        private Dictionary<string, string> parameters;
+        protected HttpConnection connection;
+        protected string path;
+        protected HttpMethod method;
+        protected string version;
+        protected Dictionary<string, string> headers;
+        protected Dictionary<string, string> parameters;
         #endregion
 
         #region Properties
@@ -35,6 +35,26 @@ namespace Karambit.Web.HTTP
             }
             internal set {
                 this.method = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets the user agent.
+        /// </summary>
+        /// <value>The user agent.</value>
+        public string UserAgent {
+            get {
+                return headers.ContainsKey("user-agent") ? headers["user-agent"] : "";
+            }
+        }
+
+        /// <summary>
+        /// Gets the hostname.
+        /// </summary>
+        /// <value>The hostname.</value>
+        public string Host {
+            get {
+                return headers.ContainsKey("host") ? headers["host"] : "";
             }
         }
 

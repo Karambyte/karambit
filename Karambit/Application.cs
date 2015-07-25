@@ -10,14 +10,26 @@ namespace Karambit
     {
         #region Fields
         private Deployment deployment = Deployment.Release;
-        private Logger logger = null;
         protected string name = "untitledapp";
         private bool running = false;
 
+        private static Logger logger;
         private static IApplication currentApp;
         #endregion
 
         #region Properties        
+        /// <summary>
+        /// Gets the current logger.
+        /// </summary>
+        /// <value>The logger.</value>
+        public static Logger Logger {
+            get {
+                if (logger == null)
+                    logger = new Logger();
+                return logger;
+            }
+        }
+
         /// <summary>
         /// Gets the deployment type.
         /// </summary>
@@ -40,15 +52,6 @@ namespace Karambit
         public bool Running {
             get {
                 return running;
-            }
-        }
-        /// <summary>
-        /// Gets the logger.
-        /// </summary>
-        /// <value>The logger.</value>
-        public Logger Logger {
-            get {
-                return logger;
             }
         }
 
@@ -170,7 +173,6 @@ namespace Karambit
         /// Initializes a new instance of the <see cref="Application"/> class.
         /// </summary>
         public Application() {
-            this.logger = new Logger();
         }
 
         /// <summary>

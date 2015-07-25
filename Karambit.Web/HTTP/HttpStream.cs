@@ -147,7 +147,7 @@ namespace Karambit.Web.HTTP
                 }
 
                 // add
-                req.Headers.Add(key, value);
+                req.Headers.Add(key.ToLower(), value);
 
                 // next
                 header = reader.ReadLine();
