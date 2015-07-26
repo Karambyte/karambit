@@ -6,7 +6,7 @@ namespace Karambit.Logging
     public class Logger : IObservable<LogMessage>
     {
         #region Fields
-        private List<string> blockedChannels = new List<string>();
+        private List<string> blockedChannels = new List<string>() { "debug" };
         private List<IObserver<LogMessage>> observers = new List<IObserver<LogMessage>>();
         #endregion
 

@@ -8,10 +8,10 @@ namespace Karambit.Web.HTTP
     public class HttpStream
     {
         #region Fields
-        private HttpConnection connection;
         private Stream stream;
         private StreamWriter writer;
         private StreamReader reader;
+        private IHttpSource source;
 
         private static Dictionary<HttpStatus, string> statusStrings;
         #endregion
@@ -21,16 +21,16 @@ namespace Karambit.Web.HTTP
         /// Writes the specified response to the stream.
         /// </summary>
         /// <param name="res">The response.</param>
-        public void Write(HttpResponse res) {
+        public void WriteResponse(HttpResponse res) {
             // status code
             HttpStatus status = res.StatusCode;
 
             // override for location redirects
-            if (res.Headers.ContainsKey("Location"))
+            if (res.Headers.ContainsKey("location"))
                 status = HttpStatus.Found;
 
             // response
-            writer.WriteLine("HTTP/1.1 " + (int)status + " " + statusStrings[status]);
+            writer.WriteLine(res.Version + " " + (int)status + " " + statusStrings[status]);
 
             // headers
             foreach (KeyValuePair<string, string> header in res.Headers) {
@@ -38,11 +38,10 @@ namespace Karambit.Web.HTTP
             }
 
             // default headers
-            writer.WriteLine("Content-Length: " + res.Buffer.Length);
-            writer.WriteLine("Connection: Keep-Alive");
+            writer.WriteLine("content-length: " + res.Buffer.Length);
 
             if (res.Server.Name != null)
-                writer.WriteLine("Server: " + res.Server.Name);
+                writer.WriteLine("server: " + res.Server.Name);
 
             // eoh
             writer.WriteLine("");
@@ -50,16 +49,56 @@ namespace Karambit.Web.HTTP
             // flush everything to stream
             writer.Flush();
 
-            // buffer
-            byte[] data = res.Buffer.ToArray();
-            stream.Write(data, 0, data.Length);
+            // body
+            if (res.Buffer.Length > 0) {
+                byte[] data = res.Buffer.ToArray();
+                stream.Write(data, 0, data.Length);
+            }
+        }
+
+        /// <summary>
+        /// Writes the specified request..
+        /// </summary>
+        /// <param name="req">The req.</param>
+        public void WriteRequest(HttpRequest req) {
+            // request line
+            string path = HttpUtilities.EncodeURL(req.Path);
+
+            if (req.Parameters.Count > 0) {
+                path += "?";
+
+                // build parameters
+                List<string> parameters = new List<string>();
+
+                foreach(KeyValuePair<string, string> param in req.Parameters)
+                    parameters.Add(string.Join("=", new string[]{HttpUtilities.EncodeURL(param.Key), HttpUtilities.EncodeURL(param.Value)}));
+
+                // append parameters
+                path += string.Join("&", parameters);
+            }
+
+            writer.WriteLine(req.Method.ToString() + " " + path + " HTTP/1.1");
+
+            // headers
+            foreach (KeyValuePair<string, string> header in req.Headers) {
+                writer.WriteLine(header.Key.ToLower() + ": " + header.Value);
+            }
+
+            writer.WriteLine("content-length: 0");
+            writer.WriteLine();
+
+            // flush everything to stream
+            writer.Flush();
+
+            // body
+            /// TODO: body
         }
 
         /// <summary>
         /// Reads a request from the stream.
         /// </summary>
         /// <returns>A request.</returns>
-        public HttpRequest Read() {
+        public HttpRequest ReadRequest() {
             // request line
             string[] requestLine = reader.ReadLine().Split(' ');
 
@@ -68,7 +107,7 @@ namespace Karambit.Web.HTTP
                 throw new HttpException("The request line is invalid", HttpStatus.BadRequest) { Path = null };
 
             // create request
-            HttpRequest req = new HttpRequest(connection);
+            HttpRequest req = new HttpRequest(source);
 
             // method
             bool validMethod = false;
@@ -83,6 +122,12 @@ namespace Karambit.Web.HTTP
 
             if (!validMethod)
                 throw new HttpException("The method is not supported", HttpStatus.BadRequest) { Path = null };
+
+            // version
+            if (requestLine[2] != "HTTP/1.1")
+                throw new HttpException("The version is invalid", HttpStatus.BadRequest) { Path = req.Path, Method = req.Method };
+
+            req.Version = requestLine[2];
 
             // path
             string path = requestLine[1];
@@ -115,14 +160,81 @@ namespace Karambit.Web.HTTP
                     req.Parameters.Add(key, value);
                 }
             } else {
-                req.Path = path;
+                req.Path = HttpUtilities.DecodeURL(path);
             }
 
-            // version
-            if (requestLine[2] != "HTTP/1.1")
-                throw new HttpException("The version is invalid", HttpStatus.BadRequest) { Path = req.Path, Method = req.Method };
+            // headers
+            req.Headers = ReadHeaders();
 
-            req.Version = requestLine[2];
+            return req;
+        }
+
+        /// <summary>
+        /// Reads the response from the stream.
+        /// </summary>
+        /// <returns></returns>
+        public HttpResponse ReadResponse() {
+            // response line
+            string[] responseLine = reader.ReadLine().Split(' ');
+
+            if (responseLine.Length < 3)
+                throw new HttpException("The response line is invalid", HttpStatus.InternalServerError);
+
+            // create response
+            HttpResponse res = new HttpResponse(source);
+            res.Version = responseLine[0];
+
+            // check version
+            if (res.Version != "HTTP/1.1")
+                throw new HttpException("The version is invalid", HttpStatus.InternalServerError);
+
+            // status code
+            int statusCode = -1;
+
+            if (!int.TryParse(responseLine[1], out statusCode))
+                throw new HttpException("The status code is invalid", HttpStatus.InternalServerError);
+
+            res.StatusCode = (HttpStatus)statusCode;
+
+            // headers
+            res.Headers = ReadHeaders();
+
+            Application.Logger.Log(Logging.LogLevel.Information, "debug", "read " + res.Headers.Count + "headers");
+
+            // body
+            Application.Logger.Log(Logging.LogLevel.Information, "debug", "content length: " + (res.Headers.ContainsKey("content-length") ? "yes" : "no"));
+            if (res.Headers.ContainsKey("content-length")) {
+                // get length
+                int contentLength = -1;
+
+                if (!int.TryParse(res.Headers["content-length"], out contentLength))
+                    throw new HttpException("The content length header is invalid", HttpStatus.InternalServerError);
+                Application.Logger.Log(Logging.LogLevel.Information, "debug", "content length: " + contentLength);
+
+                // ignore empty bodies
+                if (contentLength > 0) {
+                    // read
+                    byte[] data = new byte[contentLength];
+                    Application.Logger.Log(Logging.LogLevel.Information, "debug", "reading " + contentLength + " bytes");
+                    stream.Read(data, 0, contentLength);
+                    Application.Logger.Log(Logging.LogLevel.Information, "debug", "read " + contentLength + " bytes");
+
+                    // buffer
+                    res.Buffer = new MemoryStream(data);
+                    Application.Logger.Log(Logging.LogLevel.Information, "debug", "created buffer for " + data.Length + " bytes");
+                }
+            }
+
+            return res;
+        }
+
+        /// <summary>
+        /// Reads a set of headers from the stream.
+        /// </summary>
+        /// <returns></returns>
+        private Dictionary<string, string> ReadHeaders() {
+            // dictionary
+            Dictionary<string, string> headers = new Dictionary<string, string>();
 
             // headers
             string header = reader.ReadLine();
@@ -147,13 +259,13 @@ namespace Karambit.Web.HTTP
                 }
 
                 // add
-                req.Headers.Add(key.ToLower(), value);
+                headers.Add(key.ToLower(), value);
 
                 // next
                 header = reader.ReadLine();
             }
 
-            return req;
+            return headers;
         }
         #endregion
 
@@ -161,11 +273,10 @@ namespace Karambit.Web.HTTP
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpStream"/> class.
         /// </summary>
-        /// <param name="connection">The connection.</param>
         /// <param name="stream">The stream.</param>
-        public HttpStream(HttpConnection connection, Stream stream) {
-            this.connection = connection;
+        public HttpStream(IHttpSource source, Stream stream) {
             this.stream = stream;
+            this.source = source;
             this.reader = new StreamReader(stream);
             this.writer = new StreamWriter(stream);
         }

@@ -7,6 +7,7 @@ namespace Karambit.Web.HTTP
     {
         #region Fields
         protected HttpConnection connection;
+        protected HttpClient client;
         protected string path;
         protected HttpMethod method;
         protected string version;
@@ -17,11 +18,34 @@ namespace Karambit.Web.HTTP
         #region Properties
         /// <summary>
         /// Gets the underlying connection.
+        /// This value will be null if the response is being sent to a HttpClient object.
         /// </summary>
         /// <value>The connection.</value>
         public HttpConnection Connection {
             get {
                 return connection;
+            }
+        }
+
+        /// <summary>
+        /// Gets the client.
+        /// This value will be null if the response is being sent by a HttpServer object.
+        /// </summary>
+        /// <value>The client.</value>
+        public HttpClient Client {
+            get {
+                return client;
+            }
+        }
+
+        /// <summary>
+        /// Gets the server which the request was sent to.
+        /// This value will be null if the requested was created by a HttpClient object.
+        /// </summary>
+        /// <value>The server.</value>
+        public HttpServer Server {
+            get {
+                return (connection == null) ? null : connection.Server;
             }
         }
 
@@ -33,7 +57,7 @@ namespace Karambit.Web.HTTP
             get {
                 return method;
             }
-            internal set {
+            set {
                 this.method = value;
             }
         }
@@ -56,6 +80,9 @@ namespace Karambit.Web.HTTP
             get {
                 return headers.ContainsKey("host") ? headers["host"] : "";
             }
+            set {
+                headers["Host"] = value;
+            }
         }
 
         /// <summary>
@@ -65,8 +92,7 @@ namespace Karambit.Web.HTTP
         public string Path {
             get {
                 return path;
-            }
-            internal set {
+            } set {
                 this.path = value;
             }
         }
@@ -78,8 +104,7 @@ namespace Karambit.Web.HTTP
         public string Version {
             get {
                 return version;
-            }
-            internal set {
+            } internal set {
                 this.version = value;
             }
         }
@@ -91,6 +116,13 @@ namespace Karambit.Web.HTTP
         public Dictionary<string, string> Headers {
             get {
                 return headers;
+            }
+            internal set {
+                // check headers
+                if (headers.Count > 0)
+                    throw new InvalidOperationException("The attempted operation would omit required headers");
+
+                this.headers = value;
             }
         }
 
@@ -109,9 +141,13 @@ namespace Karambit.Web.HTTP
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpRequest"/> class.
         /// </summary>
-        /// <param name="connection">The connection.</param>
-        public HttpRequest(HttpConnection connection) {
-            this.connection = connection;
+        /// <param name="source">The source.</param>
+        internal HttpRequest(IHttpSource source) {
+            if (source is HttpClient)
+                this.client = (HttpClient)source;
+            else
+                this.connection = (HttpConnection)source;
+
             this.headers = new Dictionary<string, string>();
             this.parameters = new Dictionary<string, string>();
             this.version = "";

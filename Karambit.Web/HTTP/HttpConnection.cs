@@ -7,7 +7,7 @@ using System.Threading;
 
 namespace Karambit.Web.HTTP
 {
-    public class HttpConnection
+    public class HttpConnection : IHttpSource
     {
         #region Fields
         private TcpClient client;
@@ -95,7 +95,7 @@ namespace Karambit.Web.HTTP
 
             // read request
             try {
-                req = stream.Read();
+                req = stream.ReadRequest();
             } catch (HttpException ex) {
                 // create event
                 ErrorEventArgs e = new ErrorEventArgs(ex);
@@ -154,7 +154,7 @@ namespace Karambit.Web.HTTP
 
             // write
             try {
-                stream.Write(res);
+                stream.WriteResponse(res);
             } catch (Exception) {}
         }
 
