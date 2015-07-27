@@ -84,7 +84,7 @@ namespace Karambit.Web.HTTP
             writer.Flush();
 
             // body
-            /// TODO: body
+            // TODO: body
         }
 
         /// <summary>

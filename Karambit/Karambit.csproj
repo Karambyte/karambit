@@ -36,8 +36,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Application.cs" />
+    <Compile Include="Text\CaseInsensitiveEqualityComparer.cs" />
     <Compile Include="Deployment.cs" />
     <Compile Include="IApplication.cs" />
+    <Compile Include="IO\IniFile.cs" />
     <Compile Include="IO\ObjectReader.cs" />
     <Compile Include="IO\ObjectWriter.cs" />
     <Compile Include="IO\StringFormat.cs" />
