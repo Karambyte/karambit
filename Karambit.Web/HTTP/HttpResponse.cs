@@ -197,7 +197,7 @@ namespace Karambit.Web.HTTP
         /// Initializes a new instance of the <see cref="HttpResponse"/> class.
         /// </summary>
         /// <param name="source">The source.</param>
-        internal HttpResponse(IHttpSource source) {
+        internal HttpResponse(IHttpTransaction source) {
             if (source is HttpClient)
                 this.client = (HttpClient)source;
             else

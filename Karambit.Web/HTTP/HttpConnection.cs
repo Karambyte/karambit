@@ -7,7 +7,7 @@ using System.Threading;
 
 namespace Karambit.Web.HTTP
 {
-    public class HttpConnection : IHttpSource
+    public class HttpConnection : IHttpTransaction
     {
         #region Fields
         private TcpClient client;

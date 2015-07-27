@@ -5,16 +5,27 @@ using System.Collections.Generic;
 
 namespace Karambit
 {
+	/// <summary>
+	///  Started event handler.
+	/// </summary>
     public delegate void StartedEventHandler(object sender, EventArgs e);
+
+	/// <summary>
+	/// Stopped event handler.
+	/// </summary>
     public delegate void StoppedEventHandler(object sender, EventArgs e);
 
+	/// <summary>
+	/// An abstract class which represents the Karambit application framework.
+	/// </summary>
     public abstract class Application : IApplication
     {
         #region Fields
         private Deployment deployment = Deployment.Release;
-        protected string name = "untitledapp";
         private bool running = false;
-        protected List<IServer> servers = new List<IServer>();
+
+		protected string name = "untitledapp";
+		protected List<IServer> servers = new List<IServer>();
 
         private static Logger logger;
         private static IApplication currentApp;
@@ -83,7 +94,14 @@ namespace Karambit
         #endregion
 
         #region Events
+		/// <summary>
+		///  Occurs when the application has started.
+		/// </summary>
         public event StartedEventHandler Started;
+
+		/// <summary>
+		/// Occurs when the application has stopped.
+		/// </summary>
         public event StoppedEventHandler Stopped;
 
         /// <summary>
@@ -199,14 +217,14 @@ namespace Karambit
         /// <summary>
         /// Initializes a new instance of the <see cref="Application"/> class.
         /// </summary>
-        public Application() {
+        protected Application() {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Application"/> class.
         /// </summary>
         /// <param name="name">The name.</param>
-        public Application(string name)
+        protected Application(string name)
             : this() {
             this.name = name;
         }

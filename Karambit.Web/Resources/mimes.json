@@ -1,0 +1,7 @@
+﻿{
+    "json": "application/json",
+    "png": "image/png",
+    "jpeg": "image/jpeg",
+    "jpg": "image/jpeg",
+    "gif": "image/gif"
+}

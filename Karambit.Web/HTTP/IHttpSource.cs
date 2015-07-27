@@ -2,7 +2,7 @@
 
 namespace Karambit.Web.HTTP
 {
-    public interface IHttpSource
+    public interface IHttpTransaction
     {
     }
 }

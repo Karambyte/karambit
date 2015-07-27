@@ -11,7 +11,7 @@ namespace Karambit.Web.HTTP
         private Stream stream;
         private StreamWriter writer;
         private StreamReader reader;
-        private IHttpSource source;
+        private IHttpTransaction source;
 
         private static Dictionary<HttpStatus, string> statusStrings;
         #endregion
@@ -32,19 +32,14 @@ namespace Karambit.Web.HTTP
             // response
             writer.WriteLine(res.Version + " " + (int)status + " " + statusStrings[status]);
 
-            // headers
-            foreach (KeyValuePair<string, string> header in res.Headers) {
-                writer.WriteLine(header.Key + ": " + header.Value);
-            }
-
             // default headers
-            writer.WriteLine("content-length: " + res.Buffer.Length);
+            res.Headers["content-length"] = res.Buffer.Length.ToString();
 
             if (res.Server.Name != null)
-                writer.WriteLine("server: " + res.Server.Name);
+                res.Headers["server"] = res.Server.Name;
 
-            // eoh
-            writer.WriteLine("");
+            // headers
+            WriteHeaders(res.Headers);
 
             // flush everything to stream
             writer.Flush();
@@ -79,19 +74,31 @@ namespace Karambit.Web.HTTP
 
             writer.WriteLine(req.Method.ToString() + " " + path + " HTTP/1.1");
 
-            // headers
-            foreach (KeyValuePair<string, string> header in req.Headers) {
-                writer.WriteLine(header.Key.ToLower() + ": " + header.Value);
-            }
+            // default headers
+            req.Headers["content-length"] = (0).ToString();
 
-            writer.WriteLine("content-length: 0");
-            writer.WriteLine();
+            // headers
+            WriteHeaders(req.Headers);
 
             // flush everything to stream
             writer.Flush();
 
             // body
             /// TODO: body
+        }
+
+        /// <summary>
+        /// Writes the headers to the stream.
+        /// </summary>
+        /// <param name="headers">The headers.</param>
+        public void WriteHeaders(Dictionary<string, string> headers) {
+            // headers
+            foreach (KeyValuePair<string, string> header in headers) {
+                writer.WriteLine(header.Key.ToLower() + ": " + header.Value);
+            }
+
+            // end of headers
+            writer.WriteLine();
         }
 
         /// <summary>
@@ -199,8 +206,6 @@ namespace Karambit.Web.HTTP
             // headers
             res.Headers = ReadHeaders();
 
-            Application.Logger.Log(Logging.LogLevel.Information, "debug", "read " + res.Headers.Count + "headers");
-
             // body
             Application.Logger.Log(Logging.LogLevel.Information, "debug", "content length: " + (res.Headers.ContainsKey("content-length") ? "yes" : "no"));
             if (res.Headers.ContainsKey("content-length")) {
@@ -215,13 +220,10 @@ namespace Karambit.Web.HTTP
                 if (contentLength > 0) {
                     // read
                     byte[] data = new byte[contentLength];
-                    Application.Logger.Log(Logging.LogLevel.Information, "debug", "reading " + contentLength + " bytes");
                     stream.Read(data, 0, contentLength);
-                    Application.Logger.Log(Logging.LogLevel.Information, "debug", "read " + contentLength + " bytes");
 
                     // buffer
                     res.Buffer = new MemoryStream(data);
-                    Application.Logger.Log(Logging.LogLevel.Information, "debug", "created buffer for " + data.Length + " bytes");
                 }
             }
 
@@ -274,7 +276,7 @@ namespace Karambit.Web.HTTP
         /// Initializes a new instance of the <see cref="HttpStream"/> class.
         /// </summary>
         /// <param name="stream">The stream.</param>
-        public HttpStream(IHttpSource source, Stream stream) {
+        public HttpStream(IHttpTransaction source, Stream stream) {
             this.stream = stream;
             this.source = source;
             this.reader = new StreamReader(stream);

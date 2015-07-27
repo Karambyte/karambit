@@ -3,7 +3,7 @@ using System.Net.Sockets;
 
 namespace Karambit.Web.HTTP
 {
-    public class HttpClient : IHttpSource
+    public class HttpClient : IHttpTransaction
     {
         #region Fields
         private string host;
