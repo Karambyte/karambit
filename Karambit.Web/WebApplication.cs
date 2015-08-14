@@ -28,7 +28,6 @@ namespace Karambit.Web
                 foreach (IServer server in servers) {
                     if (server is HttpServer) {
                         HttpServer httpServer = (HttpServer)server;
-                        httpServer.Deployment = value;
 
                         if (httpServer.Serializer is JSONSerializer)
                             ((JSONSerializer)httpServer.Serializer).Format = (value == Deployment.Production) ? SerializerFormat.Tidy : SerializerFormat.Minimized;

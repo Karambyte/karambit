@@ -36,6 +36,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Application.cs" />
+    <Compile Include="Net\AcceptEventArgs.cs" />
+    <Compile Include="Net\IConnection.cs" />
+    <Compile Include="Net\Server.cs" />
     <Compile Include="Text\CaseInsensitiveEqualityComparer.cs" />
     <Compile Include="Deployment.cs" />
     <Compile Include="IApplication.cs" />

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Karambit.Net;
+using System;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -7,7 +8,7 @@ using System.Threading;
 
 namespace Karambit.Web.HTTP
 {
-    public class HttpConnection : IHttpTransaction
+    public class HttpConnection : IHttpTransaction, IConnection
     {
         #region Fields
         private TcpClient client;
@@ -19,7 +20,17 @@ namespace Karambit.Web.HTTP
         private HttpStream stream;
         #endregion
 
-        #region Properties
+        #region Properties        
+        /// <summary>
+        /// Gets the underlying client.
+        /// </summary>
+        /// <value>The client.</value>
+        public TcpClient Client {
+            get {
+                return client;
+            }
+        }
+
         /// <summary>
         /// Gets the server.
         /// </summary>
@@ -108,7 +119,7 @@ namespace Karambit.Web.HTTP
                     res.StatusCode = ex.StatusCode;
 
                     // send error report
-                    if (server.Deployment == Deployment.Production)
+                    if (Application.CurrentDeployment == Deployment.Production)
                         res.Write("<b><p>Request Error</p></b><pre>" + ex.Message + "</pre>");
                 }
             } catch (Exception ex) {
@@ -117,7 +128,7 @@ namespace Karambit.Web.HTTP
 
                 // send error report
                 try {
-                    if (server.Deployment == Deployment.Production)
+                    if (Application.CurrentDeployment == Deployment.Production)
                         res.Write("<b><p>Internal Error</p></b><pre>" + ex.ToString() + "</pre>");
                 }
                 catch (Exception) { }
@@ -129,7 +140,7 @@ namespace Karambit.Web.HTTP
 
             // handle request
             if (req != null) {
-                if (server.Deployment == Deployment.Production) {
+                if (Application.CurrentDeployment == Deployment.Production) {
                     server.OnRequest(new RequestEventArgs(req, res));
                 } else {
                     try {

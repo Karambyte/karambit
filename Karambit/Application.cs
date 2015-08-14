@@ -31,7 +31,7 @@ namespace Karambit
         private static IApplication currentApp;
         #endregion
 
-        #region Properties        
+        #region Properties
         /// <summary>
         /// Gets the current logger.
         /// </summary>
@@ -91,6 +91,27 @@ namespace Karambit
                 return currentApp;
             }
         }
+
+        /// <summary>
+        /// Gets or sets the current deployment.
+        /// When attempting to set the deployment when no application is running,
+        /// this property will do nothing. Getting the deployment value will return
+        /// release if no application is running.
+        /// </summary>
+        /// <value>The current deployment.</value>
+        public static Deployment CurrentDeployment {
+            get {
+                if (currentApp == null)
+                    return Deployment.Release;
+
+                return currentApp.Deployment;
+            } set {
+                if (currentApp == null)
+                    return;
+
+                currentApp.Deployment = value;
+            }
+        }
         #endregion
 
         #region Events
@@ -121,7 +142,7 @@ namespace Karambit
         }
         #endregion
 
-        #region Methods        
+        #region Methods
         /// <summary>
         /// Starts this application.
         /// </summary>
@@ -213,7 +234,7 @@ namespace Karambit
         }
         #endregion
 
-        #region Constructors        
+        #region Constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="Application"/> class.
         /// </summary>
