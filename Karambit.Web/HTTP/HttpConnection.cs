@@ -35,7 +35,7 @@ namespace Karambit.Web.HTTP
         /// Gets the server.
         /// </summary>
         /// <value>The server.</value>
-        public HttpServer Server {
+        public IServer Server {
             get {
                 return server;
             }

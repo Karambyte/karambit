@@ -20,7 +20,8 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\Karambit.XML</DocumentationFile>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -39,6 +40,7 @@
     <Compile Include="Net\AcceptEventArgs.cs" />
     <Compile Include="Net\IConnection.cs" />
     <Compile Include="Net\Server.cs" />
+    <Compile Include="Security\Sha256.cs" />
     <Compile Include="Text\CaseInsensitiveEqualityComparer.cs" />
     <Compile Include="Deployment.cs" />
     <Compile Include="IApplication.cs" />
@@ -58,6 +60,7 @@
     <Compile Include="Security\Crc32.cs" />
     <Compile Include="Security\Random.cs" />
     <Compile Include="Serialization\SerializerFormat.cs" />
+    <Compile Include="Utilities.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

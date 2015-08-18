@@ -42,7 +42,12 @@ namespace Karambit.Web
         }
         #endregion
 
-        #region Constructors
+        #region Constructors        
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Middleware"/> class.
+        /// </summary>
+        /// <param name="attribute">The attribute.</param>
+        /// <param name="method">The method.</param>
         public Middleware(MiddlewareAttribute attribute, MethodInfo method) {
             this.attribute = attribute;
             this.method = method;

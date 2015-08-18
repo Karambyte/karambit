@@ -17,7 +17,7 @@ namespace Karambit.Web.HTTP
         private Serializer serializer;
         private string name;
 
-        private static Utilities.Random random;
+        private static Security.Random random;
         #endregion
 
         #region Properties
@@ -123,7 +123,7 @@ namespace Karambit.Web.HTTP
         /// Initializes the <see cref="HttpServer"/> class.
         /// </summary>
         static HttpServer() {
-            HttpServer.random = new Utilities.Random();
+            HttpServer.random = new Security.Random();
         }
         #endregion
     }

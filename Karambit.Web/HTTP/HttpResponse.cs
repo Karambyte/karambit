@@ -46,7 +46,7 @@ namespace Karambit.Web.HTTP
         /// <value>The server.</value>
         public HttpServer Server {
             get {
-                return (connection == null) ? null : connection.Server;
+                return (connection == null) ? null : (HttpServer)connection.Server;
             }
         }
 
@@ -176,7 +176,7 @@ namespace Karambit.Web.HTTP
         /// </summary>
         /// <param name="obj">The object.</param>
         public void Write(object obj) {
-            Write(connection.Server.Serializer.Serialize(obj));
+            Write(((HttpServer)connection.Server).Serializer.Serialize(obj));
         }
 
         /// <summary>

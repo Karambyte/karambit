@@ -5,7 +5,7 @@ namespace Karambit.Web.HTTP
 {
     public class HttpUtilities
     {
-        #region Methods        
+        #region Methods
         /// <summary>
         /// Encodes the URL.
         /// </summary>

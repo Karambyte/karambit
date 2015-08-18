@@ -45,7 +45,7 @@ namespace Karambit.Web.HTTP
         /// <value>The server.</value>
         public HttpServer Server {
             get {
-                return (connection == null) ? null : connection.Server;
+                return (connection == null) ? null : (HttpServer)connection.Server;
             }
         }
 

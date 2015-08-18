@@ -386,7 +386,7 @@ namespace Karambit.IO
         }
         #endregion
 
-        #region Constructors        
+        #region Constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="ObjectWriter"/> class.
         /// </summary>

@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{495A5FF0-0C78-4BF7-B3BD-5E29317A31B1}</ProjectGuid>
+    <ProjectGuid>{6C847F95-A2DF-4546-8A5C-4FA74BDCCFB7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Karambit.Web</RootNamespace>
-    <AssemblyName>Karambit.Web</AssemblyName>
+    <RootNamespace>Karambit.Data</RootNamespace>
+    <AssemblyName>Karambit.Data</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -21,9 +21,8 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <Prefer32Bit>false</Prefer32Bit>
-    <DocumentationFile>
-    </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -35,60 +34,28 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HTTP\HttpFormatException.cs" />
-    <Compile Include="HTTP\IHttpSource.cs" />
-    <Compile Include="Request.cs" />
-    <Compile Include="Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Response.cs" />
-    <Compile Include="WebApplication.cs" />
-    <Compile Include="HTTP\HttpProtocol.cs" />
-    <Compile Include="Middleware.cs" />
-    <Compile Include="MiddlewareAttribute.cs" />
-    <Compile Include="Route.cs" />
-    <Compile Include="RouteAttribute.cs" />
-    <Compile Include="HTTP\ErrorEventArgs.cs" />
-    <Compile Include="HTTP\HttpClient.cs" />
-    <Compile Include="HTTP\HttpConnection.cs" />
-    <Compile Include="HTTP\HttpException.cs" />
-    <Compile Include="HTTP\HttpMethod.cs" />
-    <Compile Include="HTTP\HttpRequest.cs" />
-    <Compile Include="HTTP\HttpResponse.cs" />
-    <Compile Include="HTTP\HttpServer.cs" />
-    <Compile Include="HTTP\HttpStatus.cs" />
-    <Compile Include="HTTP\HttpStream.cs" />
-    <Compile Include="HTTP\HttpUtilities.cs" />
+    <Compile Include="Connector.cs" />
+    <Compile Include="Model.cs" />
+    <Compile Include="ModelAttribute.cs" />
+    <Compile Include="ModelFieldAttribute.cs" />
+    <Compile Include="MySql\MySqlField.cs" />
+    <Compile Include="MySql\MySqlResult.cs" />
+    <Compile Include="MySql\MySqlRow.cs" />
+    <Compile Include="MySql\MySqlType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="HTTP\RequestEventArgs.cs" />
-    <Compile Include="Serialization\JSONSerializer.cs" />
+    <Compile Include="MySql\MySqlConnector.cs" />
+    <Compile Include="MySql\MySqlNative.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Karambit\Karambit.csproj">
       <Project>{57ac7e01-fb7d-41a7-941a-218d1094e0b2}</Project>
       <Name>Karambit</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-    <None Include="Resources\mimes.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

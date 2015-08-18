@@ -108,7 +108,7 @@ namespace Karambit.Web
                     parameterValues[i] = info.DefaultValue;
                 } else {
                     // parameter exists
-                    parameterValues[i] = req.Parameters[info.Name];
+                    Utilities.DynamicParse(req.Parameters[info.Name], info.ParameterType, out parameterValues[i]);
                 }
             }
 

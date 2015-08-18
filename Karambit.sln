@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Karambit", "Karambit\Karamb
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Karambit.Web", "Karambit.Web\Karambit.Web.csproj", "{495A5FF0-0C78-4BF7-B3BD-5E29317A31B1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Karambit.Data", "Karambit.Data\Karambit.Data.csproj", "{6C847F95-A2DF-4546-8A5C-4FA74BDCCFB7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{495A5FF0-0C78-4BF7-B3BD-5E29317A31B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{495A5FF0-0C78-4BF7-B3BD-5E29317A31B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{495A5FF0-0C78-4BF7-B3BD-5E29317A31B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C847F95-A2DF-4546-8A5C-4FA74BDCCFB7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C847F95-A2DF-4546-8A5C-4FA74BDCCFB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C847F95-A2DF-4546-8A5C-4FA74BDCCFB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C847F95-A2DF-4546-8A5C-4FA74BDCCFB7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
