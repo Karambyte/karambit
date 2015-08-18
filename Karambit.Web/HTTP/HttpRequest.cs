@@ -79,8 +79,7 @@ namespace Karambit.Web.HTTP
         public string Host {
             get {
                 return headers.ContainsKey("host") ? headers["host"] : "";
-            }
-            set {
+            } internal set {
                 headers["Host"] = value;
             }
         }

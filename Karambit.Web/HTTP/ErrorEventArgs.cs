@@ -9,7 +9,7 @@ namespace Karambit.Web.HTTP
         private HttpException exception;
         #endregion
 
-        #region Properties        
+        #region Properties
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="ErrorEventArgs"/> is handled.
         /// </summary>
@@ -34,7 +34,7 @@ namespace Karambit.Web.HTTP
         }
         #endregion
 
-        #region Constructors        
+        #region Constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="ErrorEventArgs"/> class.
         /// </summary>

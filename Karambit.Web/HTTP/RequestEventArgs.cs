@@ -9,7 +9,7 @@ namespace Karambit.Web.HTTP
         private HttpResponse response;
         #endregion
 
-        #region Properties        
+        #region Properties
         /// <summary>
         /// Gets the request.
         /// </summary>

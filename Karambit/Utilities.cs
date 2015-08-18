@@ -2,9 +2,26 @@
 
 namespace Karambit
 {
+    public delegate void MethodInvoker();
+
     public static class Utilities
     {
         #region Methods
+        public static void InvokeAsync(MethodInvoker method) {
+            method.BeginInvoke(null, null);
+        }
+
+        public static bool InvokeAsync(MethodInvoker method, int timeout) {
+            if (timeout < 0)
+                throw new InvalidOperationException("The timeout cannot be less than zero");
+
+            // invoke
+            IAsyncResult res = method.BeginInvoke(null, null);
+
+            // timeout
+            return res.AsyncWaitHandle.WaitOne(timeout);
+        }
+
         /// <summary>
         /// Dynamically parses the string based on the requested type.
         /// </summary>

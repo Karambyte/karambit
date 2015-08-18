@@ -13,11 +13,9 @@ namespace Karambit.Web.HTTP
     public class HttpServer : Server
     {
         #region Fields
-        private Dictionary<ulong, HttpConnection> connections;
+        private Dictionary<Guid, HttpConnection> connections;
         private Serializer serializer;
         private string name;
-
-        private static Security.Random random;
         #endregion
 
         #region Properties
@@ -86,7 +84,7 @@ namespace Karambit.Web.HTTP
         /// <param name="res">The resource.</param>
         protected override void OnAccepted(AcceptedEventArgs e) {
             // create connection
-            ulong id = random.RandomUInt64();
+            Guid id = Guid.NewGuid();
             HttpConnection conn = new HttpConnection(this, id, e.Client);
 
             // add
@@ -114,16 +112,9 @@ namespace Karambit.Web.HTTP
         /// <param name="port">The port.</param>
         public HttpServer(IPAddress address, int port) 
             : base(address, port) {
-            this.connections = new Dictionary<ulong, HttpConnection>();
+            this.connections = new Dictionary<Guid, HttpConnection>();
             this.serializer = new EmptySerializer();
             this.name = "Karambit WS";
-        }
-
-        /// <summary>
-        /// Initializes the <see cref="HttpServer"/> class.
-        /// </summary>
-        static HttpServer() {
-            HttpServer.random = new Security.Random();
         }
         #endregion
     }

@@ -40,7 +40,7 @@
     <Compile Include="Net\AcceptEventArgs.cs" />
     <Compile Include="Net\IConnection.cs" />
     <Compile Include="Net\Server.cs" />
-    <Compile Include="Security\Sha256.cs" />
+    <Compile Include="Security\Hashing.cs" />
     <Compile Include="Text\CaseInsensitiveEqualityComparer.cs" />
     <Compile Include="Deployment.cs" />
     <Compile Include="IApplication.cs" />
@@ -57,8 +57,6 @@
     <Compile Include="Serialization\ISerializable.cs" />
     <Compile Include="Serialization\ObjectSerializer.cs" />
     <Compile Include="Serialization\Serializer.cs" />
-    <Compile Include="Security\Crc32.cs" />
-    <Compile Include="Security\Random.cs" />
     <Compile Include="Serialization\SerializerFormat.cs" />
     <Compile Include="Utilities.cs" />
   </ItemGroup>

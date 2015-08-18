@@ -13,7 +13,7 @@ namespace Karambit.Web.HTTP
         #region Fields
         private TcpClient client;
         private HttpServer server;
-        private ulong id;
+        private Guid id;
         private Thread thread;
         private string address;
         private HttpProtocol protocol;
@@ -45,7 +45,7 @@ namespace Karambit.Web.HTTP
         /// Gets the identifier.
         /// </summary>
         /// <value>The identifier.</value>
-        public ulong ID {
+        public Guid ID {
             get {
                 return id;
             }
@@ -82,7 +82,7 @@ namespace Karambit.Web.HTTP
         }
         #endregion
 
-        #region Methods        
+        #region Methods
         /// <summary>
         /// Processes the incoming connection.
         /// </summary>
@@ -186,7 +186,7 @@ namespace Karambit.Web.HTTP
         /// <param name="server">The server.</param>
         /// <param name="id">The identifier.</param>
         /// <param name="client">The client.</param>
-        public HttpConnection(HttpServer server, ulong id, TcpClient client) {
+        public HttpConnection(HttpServer server, Guid id, TcpClient client) {
             this.client = client;
             this.address = ((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString();
             this.server = server;

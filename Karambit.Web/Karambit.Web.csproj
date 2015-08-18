@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="HTTP\HttpFormatException.cs" />
+    <Compile Include="HTTP\HttpHeader.cs" />
     <Compile Include="HTTP\IHttpSource.cs" />
     <Compile Include="Request.cs" />
     <Compile Include="Resources.Designer.cs">

@@ -6,9 +6,14 @@ using System.Collections.Generic;
 namespace Karambit
 {
 	/// <summary>
-	///  Started event handler.
+	/// Started event handler.
 	/// </summary>
     public delegate void StartedEventHandler(object sender, EventArgs e);
+
+    /// <summary>
+    /// Errror event handler.
+    /// </summary>
+    public delegate void ErrorEventHandler(object sender, UnhandledExceptionEventArgs e);
 
 	/// <summary>
 	/// Stopped event handler.
@@ -126,6 +131,11 @@ namespace Karambit
         public event StoppedEventHandler Stopped;
 
         /// <summary>
+        /// Occurs when the application encounters a generic error.
+        /// </summary>
+        public event ErrorEventHandler Error;
+
+        /// <summary>
         /// Called when the application starts.
         /// </summary>
         protected virtual void OnStarted() {
@@ -140,6 +150,15 @@ namespace Karambit
             if (Stopped != null)
                 Stopped(this, new EventArgs());
         }
+
+        /// <summary>
+        /// Called when the application encounters a generic error.
+        /// </summary>
+        /// <param name="e">The <see cref="UnhandledExceptionEventArgs"/> instance containing the event data.</param>
+        protected virtual void OnError(UnhandledExceptionEventArgs e) {
+            if (Error != null)
+                Error(this, e);
+        }
         #endregion
 
         #region Methods
@@ -152,12 +171,12 @@ namespace Karambit
 
             running = true;
 
+            // invoke event
+            OnStarted();
+
             // start servers
             foreach (IServer server in servers)
                 server.Start();
-
-            // invoke event
-            OnStarted();
         }
 
         /// <summary>
@@ -169,12 +188,12 @@ namespace Karambit
 
             running = false;
 
+            // invoke event
+            OnStopped();
+
             // stop servers
             foreach (IServer server in servers)
                 server.Stop();
-
-            // invoke event
-            OnStopped();
         }
 
         /// <summary>

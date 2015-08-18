@@ -16,7 +16,7 @@ namespace Karambit.Web.HTTP
         private static Dictionary<HttpStatus, string> statusStrings;
         #endregion
 
-        #region Methods        
+        #region Methods
         /// <summary>
         /// Writes the specified response to the stream.
         /// </summary>
