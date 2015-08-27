@@ -104,11 +104,11 @@ namespace Karambit.Data.MySql
 
             // escape
             MySqlNative.mysql_real_escape_string(handle, to, str, (uint)str.Length);
-
+            
             // convert
             string outStr = Marshal.PtrToStringAnsi(to);
 
-            // fre output
+            // free output
             Marshal.FreeHGlobal(to);
 
             return outStr;

@@ -26,7 +26,29 @@ namespace Karambit.Web.HTTP
         };
         #endregion
 
-        #region Methods        
+        #region Properties        
+        /// <summary>
+        /// Gets the header name.
+        /// </summary>
+        /// <value>The name.</value>
+        public string Name {
+            get {
+                return name;
+            }
+        }
+
+        /// <summary>
+        /// Gets the header value.
+        /// </summary>
+        /// <value>The value.</value>
+        public object Value {
+            get {
+                return value;
+            }
+        }
+        #endregion
+
+        #region Methods
         /// <summary>
         /// Determines whether this is a standardised header.
         /// </summary>
@@ -62,13 +84,23 @@ namespace Karambit.Web.HTTP
 
         #region Constructors        
         /// <summary>
-        /// Initializes a new instance of the <see cref="HttpHeader"/> class.
+        /// Initializes a new instance of the <see cref="HttpHeader"/> class with an unparsed value.
         /// </summary>
         /// <param name="name">The name.</param>
         /// <param name="value">The value.</param>
         public HttpHeader(string name, string value) {
             this.name = name;
             this.value = Parse(value);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HttpHeader"/> class with a value.
+        /// </summary>
+        /// <param name="name">The name.</param>
+        /// <param name="value">The value.</param>
+        public HttpHeader(string name, object value) {
+            this.name = name;
+            this.value = (value is String) ? Parse((string)value) : value;
         }
         #endregion
     }

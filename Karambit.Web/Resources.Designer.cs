@@ -69,5 +69,32 @@ namespace Karambit.Web {
                 return ((byte[])(obj));
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {
+        ///	&quot;200&quot; : &quot;OK&quot;,
+        ///	&quot;201&quot; : &quot;Created&quot;,
+        ///	&quot;204&quot; : &quot;No Content&quot;,
+        ///	&quot;300&quot; : &quot;Multiple Choices&quot;,
+        ///	&quot;301&quot; : &quot;Moved Permanently&quot;,
+        ///	&quot;302&quot; : &quot;Found&quot;,
+        ///	&quot;304&quot; : &quot;Not Modified&quot;,
+        ///	&quot;307&quot; : &quot;Temporary Redirect&quot;,
+        ///	&quot;400&quot; : &quot;Bad Request&quot;,
+        ///	&quot;401&quot; : &quot;Unauthorized&quot;,
+        ///	&quot;403&quot; : &quot;Forbidden&quot;,
+        ///	&quot;404&quot; : &quot;Not Found&quot;,
+        ///	&quot;410&quot; : &quot;Gone&quot;,
+        ///	&quot;500&quot; : &quot;Internal Server Error&quot;,
+        ///	&quot;501&quot; : &quot;Not Implemented&quot;,
+        ///	&quot;503&quot; : &quot;Service Unavailable&quot;,
+        ///	&quot;550&quot; : &quot;Permission Denied&quot;
+        ///}.
+        /// </summary>
+        internal static string status {
+            get {
+                return ResourceManager.GetString("status", resourceCulture);
+            }
+        }
     }
 }

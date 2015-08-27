@@ -2,6 +2,9 @@
 
 namespace Karambit.IO
 {
+    /// <summary>
+    /// An enum representing the possible ways to format a string in binary.
+    /// </summary>
     public enum StringFormat
     {
         /// <summary>

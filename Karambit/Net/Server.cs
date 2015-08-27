@@ -1,11 +1,20 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 
 namespace Karambit.Net
 {
+    /// <summary>
+    /// An event handler for accepting incoming connections.
+    /// </summary>
+    /// <param name="sender">The sender.</param>
+    /// <param name="e">The <see cref="AcceptedEventArgs"/> instance containing the event data.</param>
     public delegate void AcceptedEventHandler(object sender, AcceptedEventArgs e);
 
+    /// <summary>
+    /// A class that represents a basic server which listens for connections on a networking port.
+    /// </summary>
     public class Server : IServer
     {
         #region Fields
@@ -14,7 +23,7 @@ namespace Karambit.Net
         protected TcpListener listener;
         #endregion
 
-        #region Properties        
+        #region Properties
         /// <summary>
         /// Gets a value indicating whether this server is running.
         /// </summary>
@@ -66,6 +75,10 @@ namespace Karambit.Net
             running = true;
         }
 
+        /// <summary>
+        /// Accepts a client.
+        /// </summary>
+        /// <param name="res">The async data.</param>
         protected virtual void Accept(IAsyncResult res) {
             // accept
             TcpClient client = listener.EndAcceptTcpClient(res);
@@ -91,7 +104,7 @@ namespace Karambit.Net
         }
         #endregion
 
-        #region Constructors        
+        #region Constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="Server"/> class.
         /// </summary>

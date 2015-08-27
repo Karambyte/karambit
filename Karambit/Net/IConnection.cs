@@ -3,6 +3,9 @@ using System.Net.Sockets;
 
 namespace Karambit.Net
 {
+    /// <summary>
+    /// An interface for objects which represent the serverside aspects of a client.
+    /// </summary>
     public interface IConnection
     {
         /// <summary>

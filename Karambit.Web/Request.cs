@@ -19,7 +19,7 @@ namespace Karambit.Web
                 this.headers = req.Headers;
                 this.method = req.Method;
                 this.path = req.Path;
-                this.parameters = req.Parameters;
+                this.query = req.Query;
                 this.version = req.Version;
         }
         #endregion

@@ -2,6 +2,9 @@
 
 namespace Karambit.Net
 {
+    /// <summary>
+    /// An interface that represents a server which can accept connections and runs on a networking port.
+    /// </summary>
     public interface IServer
     {
         /// <summary>

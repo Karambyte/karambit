@@ -46,6 +46,10 @@
   <ItemGroup>
     <Compile Include="HTTP\HttpFormatException.cs" />
     <Compile Include="HTTP\HttpHeader.cs" />
+    <Compile Include="HTTP\HttpHeaderCollection.cs" />
+    <Compile Include="HTTP\HttpReader.cs" />
+    <Compile Include="HTTP\HttpRequestLine.cs" />
+    <Compile Include="HTTP\HttpWriter.cs" />
     <Compile Include="HTTP\IHttpSource.cs" />
     <Compile Include="Request.cs" />
     <Compile Include="Resources.Designer.cs">
@@ -53,6 +57,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="ResourcesProcessor.cs" />
     <Compile Include="Response.cs" />
     <Compile Include="WebApplication.cs" />
     <Compile Include="HTTP\HttpProtocol.cs" />
@@ -69,7 +74,6 @@
     <Compile Include="HTTP\HttpResponse.cs" />
     <Compile Include="HTTP\HttpServer.cs" />
     <Compile Include="HTTP\HttpStatus.cs" />
-    <Compile Include="HTTP\HttpStream.cs" />
     <Compile Include="HTTP\HttpUtilities.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="HTTP\RequestEventArgs.cs" />
@@ -84,6 +88,7 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="Resources\mimes.json" />
+    <None Include="Resources\status.json" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources.resx">

@@ -2,15 +2,18 @@
 
 namespace Karambit.Logging
 {
-    public class LogMessage
+    /// <summary>
+    /// A class which represents a log message.
+    /// </summary>
+    public sealed class LogMessage
     {
         #region Fields
-        public string message;
-        public LogLevel level;
-        public string channel;
+        private string message;
+        private LogLevel level;
+        private string channel;
         #endregion
 
-        #region Properties        
+        #region Properties
         /// <summary>
         /// Gets the message.
         /// </summary>
@@ -42,7 +45,7 @@ namespace Karambit.Logging
         }
         #endregion
 
-        #region Constructors        
+        #region Constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="LogMessage"/> class.
         /// </summary>

@@ -13,7 +13,7 @@ namespace Karambit.Web.HTTP
         protected MemoryStream buffer;
         protected HttpStatus status;
         protected string version = "HTTP/1.1";
-        protected Dictionary<string, string> headers;
+        protected HttpHeaderCollection headers;
         #endregion
 
         #region Properties
@@ -70,8 +70,7 @@ namespace Karambit.Web.HTTP
         public MemoryStream Buffer {
             get {
                 return buffer;
-            }
-            internal set {
+            } internal set {
                 this.buffer = value;
             }
         }
@@ -82,21 +81,20 @@ namespace Karambit.Web.HTTP
         /// <value>The type of the content.</value>
         public string ContentType {
             get {
-                return headers["Content-Type"];
+                return (string)headers["Content-Type"];
             } set {
                 this.headers["Content-Type"] = value;
             }
         }
 
         /// <summary>
-        /// Gets or sets the location.
+        /// Gets or sets the location, or null.
         /// </summary>
         /// <value>The location.</value>
         public string Location {
             get {
-                return headers.ContainsKey("Location") ? headers["Location"] : "";
-            }
-            set {
+                return (string)headers["Location"];
+            } set {
                 this.headers["Location"] = value;
             }
         }
@@ -105,15 +103,10 @@ namespace Karambit.Web.HTTP
         /// Gets the headers.
         /// </summary>
         /// <value>The headers.</value>
-        public Dictionary<string, string> Headers {
+        public HttpHeaderCollection Headers {
             get {
                 return headers;
-            }
-            internal set {
-                // check headers
-                if (headers.Count > 0)
-                    throw new InvalidOperationException("The attempted operation would omit required headers");
-
+            } internal set {
                 this.headers = value;
             }
         }
@@ -125,8 +118,7 @@ namespace Karambit.Web.HTTP
         public string Version {
             get {
                 return version;
-            }
-            internal set {
+            } internal set {
                 this.version = value;
             }
         }
@@ -205,14 +197,11 @@ namespace Karambit.Web.HTTP
 
             this.status = HttpStatus.OK;
             this.buffer = new MemoryStream();
-            this.headers = new Dictionary<string, string>() {
-                
-            };
+            this.headers = new HttpHeaderCollection();
 
             if (source is HttpConnection) {
-                headers.Add("Content-Type", "text/html");
-                headers.Add("Connection", "Keep-Alive");
-                headers.Add("X-Frame-Options", "deny");
+                headers["Content-Type"] = "text/html";
+                headers["X-Frame-Options"] = "deny";
             }
         }
         #endregion

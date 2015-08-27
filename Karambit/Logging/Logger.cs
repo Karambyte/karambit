@@ -3,14 +3,14 @@ using System.Collections.Generic;
 
 namespace Karambit.Logging
 {
-    public class Logger : IObservable<LogMessage>
+    public sealed class Logger : IObservable<LogMessage>
     {
         #region Fields
         private List<string> blockedChannels = new List<string>() { "debug" };
         private List<IObserver<LogMessage>> observers = new List<IObserver<LogMessage>>();
         #endregion
 
-        #region Methods        
+        #region Methods
         /// <summary>
         /// Blocks the specified channel from emitting log messages.
         /// </summary>

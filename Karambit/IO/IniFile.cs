@@ -7,7 +7,7 @@ using System.IO;
 namespace Karambit.IO
 {
     /// <summary>
-    /// A sealed class representing an Ini file.
+    /// A class representing an Ini file.
     /// </summary>
     public sealed class IniFile
     {
@@ -16,7 +16,7 @@ namespace Karambit.IO
         private Dictionary<string, Dictionary<string, string>> sections = new Dictionary<string, Dictionary<string, string>>(new CaseInsensitiveEqualityComparer());
         #endregion
 
-        #region Properties        
+        #region Properties
         /// <summary>
         /// Gets the source, the filename or stream type.
         /// </summary>
@@ -30,7 +30,7 @@ namespace Karambit.IO
         }
         #endregion
 
-        #region Methods        
+        #region Methods
         /// <summary>
         /// Sets the specified key in the provided section to the requested value.
         /// </summary>
@@ -176,7 +176,7 @@ namespace Karambit.IO
         }
         #endregion
 
-        #region Constructors        
+        #region Constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="IniFile"/> class.
         /// </summary>
@@ -184,7 +184,7 @@ namespace Karambit.IO
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="IniFile"/> class.
+        /// Initializes a new instance of the <see cref="IniFile"/> class and loads from the specified file.
         /// </summary>
         /// <param name="path">The path.</param>
         public IniFile(string path) {
@@ -192,7 +192,7 @@ namespace Karambit.IO
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="IniFile"/> class.
+        /// Initializes a new instance of the <see cref="IniFile"/> class and loads from the specified stream.
         /// </summary>
         /// <param name="stream">The stream.</param>
         public IniFile(Stream stream) {

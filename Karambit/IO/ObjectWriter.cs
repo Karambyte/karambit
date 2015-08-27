@@ -388,7 +388,7 @@ namespace Karambit.IO
 
         #region Constructors
         /// <summary>
-        /// Initializes a new instance of the <see cref="ObjectWriter"/> class.
+        /// Initializes a new instance of the <see cref="ObjectWriter"/> class using the specified stream.
         /// </summary>
         /// <param name="stream">The stream.</param>
         public ObjectWriter(Stream stream) {
@@ -396,7 +396,7 @@ namespace Karambit.IO
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ObjectWriter"/> class.
+        /// Initializes a new instance of the <see cref="ObjectWriter"/> class using the specified stream and provided encoding.
         /// </summary>
         /// <param name="stream">The stream.</param>
         /// <param name="encoding">The encoding.</param>

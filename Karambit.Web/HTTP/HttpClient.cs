@@ -9,7 +9,8 @@ namespace Karambit.Web.HTTP
         private string host;
         private int port;
         protected TcpClient client;
-        protected HttpStream stream;
+        protected HttpWriter writer;
+        protected HttpReader reader;
         #endregion
 
         #region Properties        
@@ -40,7 +41,11 @@ namespace Karambit.Web.HTTP
         /// </summary>
         private void Connect() {
             client = new TcpClient(host, port);
-            stream = new HttpStream(this, client.GetStream());
+
+            NetworkStream stream = client.GetStream();
+            reader = new HttpReader(stream, this);
+            writer = new HttpWriter(stream, this);
+
             Application.Logger.Log(Logging.LogLevel.Information, "debug", "connected to " + host + ":" + port);
         }
 
@@ -79,10 +84,10 @@ namespace Karambit.Web.HTTP
                 Connect();
 
             // write request
-            stream.WriteRequest(req);
+            writer.WriteRequest(req);
 
             // read response
-            return stream.ReadResponse();
+            return reader.ReadResponse();
         }
         #endregion
 

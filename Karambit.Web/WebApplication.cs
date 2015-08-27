@@ -95,7 +95,7 @@ namespace Karambit.Web
             for (int i = 2; i < parameters.Length; i++) {
                 // get parameter
                 ParameterInfo info = parameters[i];
-                bool hasParameter = req.Parameters.ContainsKey(info.Name);
+                bool hasParameter = req.Query.ContainsKey(info.Name);
 
                 if (!info.HasDefaultValue && !hasParameter) {
                     // missing parameter and no default value
@@ -108,7 +108,7 @@ namespace Karambit.Web
                     parameterValues[i] = info.DefaultValue;
                 } else {
                     // parameter exists
-                    Utilities.DynamicParse(req.Parameters[info.Name], info.ParameterType, out parameterValues[i]);
+                    Utilities.DynamicParse(req.Query[info.Name], info.ParameterType, out parameterValues[i]);
                 }
             }
 

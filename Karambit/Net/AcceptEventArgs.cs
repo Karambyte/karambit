@@ -9,7 +9,7 @@ namespace Karambit.Net
         private TcpClient client;
         #endregion
 
-        #region Properties        
+        #region Properties
         /// <summary>
         /// Gets or sets the client.
         /// </summary>
@@ -23,9 +23,9 @@ namespace Karambit.Net
         }
         #endregion
 
-        #region Constructors        
+        #region Constructors
         /// <summary>
-        /// Initializes a new instance of the <see cref="AcceptedEventArgs"/> class.
+        /// Initializes a new instance of the <see cref="AcceptedEventArgs"/> class with the relevant TCP client.
         /// </summary>
         /// <param name="client">The client.</param>
         public AcceptedEventArgs(TcpClient client) {

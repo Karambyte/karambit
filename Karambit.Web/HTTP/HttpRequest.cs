@@ -11,8 +11,8 @@ namespace Karambit.Web.HTTP
         protected string path;
         protected HttpMethod method;
         protected string version;
-        protected Dictionary<string, string> headers;
-        protected Dictionary<string, string> parameters;
+        protected HttpHeaderCollection headers;
+        protected Dictionary<string, string> query;
         #endregion
 
         #region Properties
@@ -68,7 +68,7 @@ namespace Karambit.Web.HTTP
         /// <value>The user agent.</value>
         public string UserAgent {
             get {
-                return headers.ContainsKey("user-agent") ? headers["user-agent"] : "";
+                return (string)headers["User-Agent"];
             }
         }
 
@@ -78,7 +78,7 @@ namespace Karambit.Web.HTTP
         /// <value>The hostname.</value>
         public string Host {
             get {
-                return headers.ContainsKey("host") ? headers["host"] : "";
+                return (string)headers["Host"];
             } internal set {
                 headers["Host"] = value;
             }
@@ -112,15 +112,11 @@ namespace Karambit.Web.HTTP
         /// Gets the headers.
         /// </summary>
         /// <value>The headers.</value>
-        public Dictionary<string, string> Headers {
+        public HttpHeaderCollection Headers {
             get {
                 return headers;
             }
             internal set {
-                // check headers
-                if (headers.Count > 0)
-                    throw new InvalidOperationException("The attempted operation would omit required headers");
-
                 this.headers = value;
             }
         }
@@ -129,9 +125,11 @@ namespace Karambit.Web.HTTP
         /// Gets the parameters.
         /// </summary>
         /// <value>The parameters.</value>
-        public Dictionary<string, string> Parameters {
+        public Dictionary<string, string> Query {
             get {
-                return parameters;
+                return query;
+            } internal set {
+                this.query = value;
             }
         }
         #endregion
@@ -147,8 +145,8 @@ namespace Karambit.Web.HTTP
             else
                 this.connection = (HttpConnection)source;
 
-            this.headers = new Dictionary<string, string>();
-            this.parameters = new Dictionary<string, string>();
+            this.headers = new HttpHeaderCollection();
+            this.query = new Dictionary<string, string>();
             this.version = "";
             this.path = "";
         }

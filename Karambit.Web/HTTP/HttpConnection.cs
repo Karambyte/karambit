@@ -14,10 +14,10 @@ namespace Karambit.Web.HTTP
         private TcpClient client;
         private HttpServer server;
         private Guid id;
-        private Thread thread;
         private string address;
         private HttpProtocol protocol;
-        private HttpStream stream;
+        private HttpWriter writer;
+        private HttpReader reader;
         #endregion
 
         #region Properties        
@@ -62,16 +62,6 @@ namespace Karambit.Web.HTTP
         }
 
         /// <summary>
-        /// Gets the stream.
-        /// </summary>
-        /// <value>The stream.</value>
-        public HttpStream Stream {
-            get {
-                return stream;
-            }
-        }
-
-        /// <summary>
         /// Gets the remote address.
         /// </summary>
         /// <value>The address.</value>
@@ -87,8 +77,12 @@ namespace Karambit.Web.HTTP
         /// Processes the incoming connection.
         /// </summary>
         private void Process() {
-            // create stream
-            this.stream = new HttpStream(this, client.GetStream());
+            // get stream
+            NetworkStream stream = client.GetStream();
+
+            // create reader/writer
+            this.writer = new HttpWriter(stream, this);
+            this.reader = new HttpReader(stream, this);
 
             // handle requests
             while (client.Connected) {
@@ -96,18 +90,13 @@ namespace Karambit.Web.HTTP
             }
         }
 
-        /// <summary>
-        /// Handles the request.
-        /// </summary>
-        private void Handle() {
-            // create response
-            HttpResponse res = new HttpResponse(this);
+        private HttpRequest ReadRequest(HttpResponse res) {
             HttpRequest req = null;
 
-            // read request
             try {
-                req = stream.ReadRequest();
-            } catch (HttpException ex) {
+                req = reader.ReadRequest();
+            }
+            catch (HttpException ex) {
                 // create event
                 ErrorEventArgs e = new ErrorEventArgs(ex);
 
@@ -122,7 +111,8 @@ namespace Karambit.Web.HTTP
                     if (Application.CurrentDeployment == Deployment.Production)
                         res.Write("<b><p>Request Error</p></b><pre>" + ex.Message + "</pre>");
                 }
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
                 // status code
                 res.StatusCode = HttpStatus.InternalServerError;
 
@@ -135,6 +125,46 @@ namespace Karambit.Web.HTTP
 
                 // close and return
                 Close();
+                return req;
+            }
+
+            Console.WriteLine("FINISHED occuredreq");
+            return req;
+        }
+
+        private void WriteResponse(HttpResponse res) {
+
+            // post-process
+            if (res.Headers.Exists("Location"))
+                res.StatusCode = HttpStatus.Found;
+
+            res.Headers["Content-Length"] = res.Buffer.Length.ToString();
+            res.Headers["Connection"] = "Keep-Alive";
+
+            if (res.Server.Name != null)
+                res.Headers["Server"] = res.Server.Name;
+
+            // write response
+            //try {
+            writer.WriteResponse(res);
+            //}
+            //catch (Exception) { }
+        }
+
+        /// <summary>
+        /// Handles the request.
+        /// </summary>
+        private void Handle() {
+            // create response
+            HttpResponse res = new HttpResponse(this);
+            HttpRequest req = null;
+
+            // read request
+            if (!Utilities.InvokeAsync(delegate() { req = ReadRequest(res);}, 1000)) {
+                // close and return
+                Close();
+
+                Console.WriteLine("timeout occuredreq");
                 return;
             }
 
@@ -164,9 +194,13 @@ namespace Karambit.Web.HTTP
             }
 
             // write
-            try {
-                stream.WriteResponse(res);
-            } catch (Exception) {}
+            if (!Utilities.InvokeAsync(delegate() { WriteResponse(res); }, 1000)) {
+                // close and return
+                Close();
+
+                Console.WriteLine("timeout occuredres");
+                return;
+            }
         }
 
         /// <summary>
@@ -193,11 +227,8 @@ namespace Karambit.Web.HTTP
             this.id = id;
             this.protocol = HttpProtocol.HTTP;
 
-            // thread
-            this.thread = new Thread(new ThreadStart(Process));
-            this.thread.Name = "KHttpConn";
-            this.thread.IsBackground = true;
-            this.thread.Start();
+            // process
+            Utilities.InvokeAsync(Process);
         }
         #endregion
     }

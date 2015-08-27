@@ -54,7 +54,7 @@ namespace Karambit.Web
         }
         #endregion
 
-        #region Constructors        
+        #region Constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="RouteAttribute"/> class.
         /// </summary>

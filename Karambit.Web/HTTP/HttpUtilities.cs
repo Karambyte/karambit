@@ -11,7 +11,7 @@ namespace Karambit.Web.HTTP
         /// </summary>
         /// <param name="url">The URL.</param>
         /// <returns></returns>
-        public static string EncodeURL(string url) {
+        public static string EncodeString(string url) {
             return WebUtility.UrlEncode(url);
         }
 
@@ -20,7 +20,7 @@ namespace Karambit.Web.HTTP
         /// </summary>
         /// <param name="url">The URL.</param>
         /// <returns></returns>
-        public static string DecodeURL(string url) {
+        public static string DecodeString(string url) {
             return WebUtility.UrlDecode(url);
         }
         #endregion
